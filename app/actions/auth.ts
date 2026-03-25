@@ -50,10 +50,15 @@ export async function signUpAsRole(
     return { error: 'Not authenticated' }
   }
 
+  // Support both firstName+lastName and legacy name field
+  const full_name = data.firstName && data.lastName
+    ? `${data.firstName.trim()} ${data.lastName.trim()}`
+    : data.name ?? ''
+
   const { error: userError } = await supabase.from('users').upsert({
     id: user.id,
-    auth_provider: user.app_metadata?.provider ?? 'google',
-    phone: user.phone ?? null,
+    auth_provider: user.app_metadata?.provider ?? 'phone',
+    phone: data.mobile ?? user.phone ?? null,
   })
 
   console.log('2. userError:', userError?.message)
@@ -65,7 +70,8 @@ export async function signUpAsRole(
   if (role === 'farmer') {
     const { error } = await supabase.from('farmers').insert({
       user_id: user.id,
-      full_name: data.name,
+      first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
+      last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
       village: data.village,
       district: data.district,
       state: data.state,
@@ -85,7 +91,8 @@ export async function signUpAsRole(
   } else {
     const { error } = await supabase.from('workers').insert({
       user_id: user.id,
-      full_name: data.name,
+      first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
+      last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
       village: data.village,
       district: data.district,
       state: data.state,

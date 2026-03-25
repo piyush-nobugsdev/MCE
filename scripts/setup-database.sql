@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS farmers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  full_name VARCHAR(255) NOT NULL,
+  first_name VARCHAR(120) NOT NULL,
+  last_name  VARCHAR(120) NOT NULL,
+  full_name  VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
   village VARCHAR(255) NOT NULL,
   district VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,
@@ -26,7 +28,9 @@ CREATE TABLE IF NOT EXISTS farmers (
 CREATE TABLE IF NOT EXISTS workers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-  full_name VARCHAR(255) NOT NULL,
+  first_name VARCHAR(120) NOT NULL,
+  last_name  VARCHAR(120) NOT NULL,
+  full_name  VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
   village VARCHAR(255) NOT NULL,
   district VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,
