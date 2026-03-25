@@ -46,7 +46,7 @@ export async function GET(request: Request) {
     .single()
 
   if (farmer) {
-    return NextResponse.redirect(`${origin}/dashboard/farmer`)
+    return NextResponse.redirect(`${origin}/farmer/dashboard`)
   }
 
   const { data: worker } = await supabase
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     .single()
 
   if (worker) {
-    return NextResponse.redirect(`${origin}/dashboard/worker`)
+    return NextResponse.redirect(`${origin}/worker/dashboard`)
   }
 
   // User row exists but no farmer/worker profile yet

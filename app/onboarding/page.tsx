@@ -1,20 +1,36 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import OnboardingClient from './_components/OnboardingClient'
 
-import { useEffect, useState } from 'react'
-import FarmerOnboardingForm from './_components/farmerOnboardingForm'
-import WorkerOnboardingForm from './_components/workerOnboardingForm'
+export default async function OnboardingPage() {
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
 
-export default function OnboardingPage() {
-  const [role, setRole] = useState<string | null>(null)
+  console.log('onboarding page user:', user?.id)
 
-  useEffect(() => {
-    const r = localStorage.getItem('pending_role')
-    setRole(r)
-  }, [])
+  // If no session at all, send back to auth
+  if (!user) {
+    redirect('/auth/role-selection')
+  }
 
-  if (!role) return <div>Loading...</div>
+  // If they already have a profile, send to dashboard
+  const { data: farmer } = await supabase
+    .from('farmers')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
 
-  return role === 'farmer' 
-    ? <FarmerOnboardingForm /> 
-    : <WorkerOnboardingForm />
+  if (farmer) redirect('/farmer/dashboard')
+
+  const { data: worker } = await supabase
+    .from('workers')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
+  if (worker) redirect('/worker/dashboard')
+
+  // Has session, no profile yet — show onboarding form
+  return <OnboardingClient />
 }

@@ -34,6 +34,7 @@ export async function verifyOtp(phone: string, token: string) {
   revalidatePath('/', 'layout')
   return { success: true }
 }
+
 export async function signUpAsRole(
   role: 'farmer' | 'worker',
   data: Record<string, string>
@@ -50,16 +51,25 @@ export async function signUpAsRole(
     return { error: 'Not authenticated' }
   }
 
-  const { error: userError } = await supabase.from('users').upsert({
-    id: user.id,
-    auth_provider: user.app_metadata?.provider ?? 'google',
-    phone: user.phone ?? null,
-  })
+  // Check first, insert only if missing
+  const { data: existingUser } = await supabase
+    .from('users')
+    .select('id')
+    .eq('id', user.id)
+    .single()
 
-  console.log('2. userError:', userError?.message)
+  if (!existingUser) {
+    const { error: userError } = await supabase.from('users').insert({
+      id: user.id,
+      auth_provider: user.app_metadata?.provider ?? 'google',
+      phone: user.phone && user.phone !== '' ? user.phone : null,
+    })
 
-  if (userError) {
-    return { error: userError.message }
+    console.log('2. userError:', userError?.message)
+
+    if (userError) {
+      return { error: userError.message }
+    }
   }
 
   if (role === 'farmer') {
@@ -109,6 +119,7 @@ export async function signUpAsRole(
   revalidatePath('/', 'layout')
   redirect(role === 'farmer' ? '/farmer/dashboard' : '/worker/dashboard')
 }
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
