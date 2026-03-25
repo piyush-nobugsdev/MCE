@@ -91,7 +91,23 @@ export default function WorkerEarningsPage() {
       <WorkerNavbar />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Earnings</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Earnings History</h1>
+          <p className="text-gray-500 mt-1">View your past jobs and earnings records.</p>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-8 flex items-start gap-4">
+          <div className="bg-blue-100 p-2 rounded-lg">
+            <DollarSign className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-blue-900">Payment Collection</h4>
+            <p className="text-sm text-blue-700">
+              Payments are collected directly from the farmer on-site. The app provides this history to help you track your total work and earnings for free.
+            </p>
+          </div>
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">

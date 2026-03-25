@@ -22,7 +22,7 @@ export default function FarmerDashboard() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        window.location.href = '/auth/phone'
+        window.location.href = '/auth/role-selection'
         return
       }
 
@@ -81,7 +81,7 @@ export default function FarmerDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {farmer.name}!
+            Welcome, {farmer.full_name}!
           </h1>
           <p className="text-gray-600">Manage your farm jobs and workers</p>
         </div>
@@ -164,7 +164,7 @@ export default function FarmerDashboard() {
                           {typeof job.location === 'string' ? job.location : job.location?.name || 'Unknown location'}
                         </p>
                         <p className="text-sm text-green-600 font-medium mt-1">
-                          ${job.wage_amount}/day
+                          ₹{job.wage_amount}/day
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
