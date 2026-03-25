@@ -33,7 +33,7 @@ export async function getFarmerApplications() {
   const { data, error } = await supabase
     .from('applications')
     .select(`
-      id, status, applied_at, worker_code, farmer_rated_worker,
+      id, status, applied_at, worker_code, farmer_rated_worker, farmer_completed, worker_completed,
       jobs!inner(id, title, location, status),
       workers!inner(rating, total_jobs_completed, skills, home_location, first_name, last_name)
     `)
@@ -68,8 +68,10 @@ export async function getFarmerApplications() {
       worker_rating: app.workers.rating,
       worker_completed_jobs: app.workers.total_jobs_completed,
       worker_skills: app.workers.skills,
-      distance: distance ? Math.round(distance * 10) / 10 : null, // Round to 1 decimal
-      farmer_rated_worker: app.farmer_rated_worker
+      distance: distance ? Math.round(distance * 10) / 10 : null,
+      farmer_rated_worker: app.farmer_rated_worker,
+      farmer_completed: app.farmer_completed ?? false,
+      worker_completed: app.worker_completed ?? false,
     }
   })
 
@@ -93,7 +95,7 @@ export async function getWorkerApplications() {
   const { data, error } = await supabase
     .from('applications')
     .select(`
-      id, status, applied_at, worker_rated_farmer,
+      id, status, applied_at, worker_rated_farmer, farmer_completed, worker_completed,
       jobs!inner(id, title, location, status, farmer_code, wage_amount, farmers(first_name, village))
     `)
     .eq('worker_id', worker.id)
@@ -114,9 +116,69 @@ export async function getWorkerApplications() {
     farmer_code: app.jobs.farmer_code,
     farmer_first_name: app.jobs.farmers?.first_name ?? '',
     farmer_farm_name: app.jobs.farmers?.village ?? '',
+    farmer_completed: app.farmer_completed ?? false,
+    worker_completed: app.worker_completed ?? false,
   }))
 
   return { applications }
+}
+
+/**
+ * Marks one side's completion for an accepted application.
+ * When both farmer_completed and worker_completed are true,
+ * the application status is updated to 'completed'.
+ */
+export async function markCompletion(applicationId: string, role: 'farmer' | 'worker') {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Fetch the application with job and parties
+  const { data: application, error: fetchError } = await supabase
+    .from('applications')
+    .select(`
+      id, status, worker_id, farmer_completed, worker_completed,
+      jobs!inner(farmer_id)
+    `)
+    .eq('id', applicationId)
+    .maybeSingle()
+
+  if (fetchError) return { error: fetchError.message }
+  if (!application) return { error: 'Application not found' }
+  if (application.status !== 'accepted') return { error: 'Job must be accepted before marking complete' }
+
+  const job = Array.isArray(application.jobs) ? application.jobs[0] : application.jobs
+
+  // Verify the caller is the correct party
+  if (role === 'farmer') {
+    const { data: farmer } = await supabase.from('farmers').select('id').eq('user_id', user.id).maybeSingle()
+    if (!farmer || farmer.id !== job.farmer_id) return { error: 'Unauthorized' }
+    if (application.farmer_completed) return { error: 'Already marked as complete' }
+  } else {
+    const { data: worker } = await supabase.from('workers').select('id').eq('user_id', user.id).maybeSingle()
+    if (!worker || worker.id !== application.worker_id) return { error: 'Unauthorized' }
+    if (application.worker_completed) return { error: 'Already marked as complete' }
+  }
+
+  const updateField = role === 'farmer' ? { farmer_completed: true } : { worker_completed: true }
+
+  // Determine new status: if the OTHER side already completed, both are done
+  const otherSideDone = role === 'farmer' ? application.worker_completed : application.farmer_completed
+  const newStatus = otherSideDone ? 'completed' : 'accepted'
+
+  const { error: updateError } = await supabase
+    .from('applications')
+    .update({ ...updateField, status: newStatus })
+    .eq('id', applicationId)
+
+  if (updateError) return { error: updateError.message }
+
+  revalidatePath('/farmer/applications')
+  revalidatePath('/worker/applications')
+  revalidatePath('/worker/dashboard')
+  revalidatePath('/farmer/dashboard')
+  return { success: true, fullyCompleted: newStatus === 'completed' }
 }
 
 export async function updateApplicationStatus(applicationId: string, status: 'accepted' | 'rejected') {

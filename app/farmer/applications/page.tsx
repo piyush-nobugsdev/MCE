@@ -4,43 +4,52 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FarmerNavbar } from '@/app/farmer/components/navbar'
-import { CheckCircle2, XCircle, Clock, MapPin, Star, Briefcase, Users, Tag, MessageSquare } from 'lucide-react'
+import { CheckCircle2, XCircle, Clock, MapPin, Star, Briefcase, Users, Tag, CheckCheck } from 'lucide-react'
 import { ApplicationWithDetails } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { toast } from 'sonner'
-import { getFarmerApplications, updateApplicationStatus } from '@/app/actions/applications'
+import { getFarmerApplications, updateApplicationStatus, markCompletion } from '@/app/actions/applications'
 import { rateUser } from '@/app/actions/ratings'
 
 export const dynamic = 'force-dynamic'
+
+/** Derive a human-readable completion status for a given application from the farmer's POV. */
+function getCompletionStatus(app: ApplicationWithDetails) {
+  if (app.status === 'completed') return 'completed'
+  if (app.farmer_completed && !app.worker_completed) return 'pending_worker'
+  if (!app.farmer_completed && app.worker_completed) return 'pending_farmer'
+  return null // active / not yet in completion flow
+}
 
 export default function ApplicationsPage() {
   const { t } = useLanguage()
   const [applications, setApplications] = useState<ApplicationWithDetails[]>([])
   const [loading, setLoading] = useState(true)
+  const [completingId, setCompletingId] = useState<string | null>(null)
   const [ratingModal, setRatingModal] = useState<{
     open: boolean
     applicationId: string
-    workerCode: string
+    workerName: string
   } | null>(null)
   const [rating, setRating] = useState(5)
   const [feedback, setFeedback] = useState('')
   const [ratingLoading, setRatingLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => { setMounted(true) }, [])
+
+  const refresh = async () => {
+    const result = await getFarmerApplications()
+    if (result.applications) setApplications(result.applications)
+  }
 
   useEffect(() => {
     let isMounted = true
     const fetchApplications = async () => {
       const result = await getFarmerApplications()
       if (isMounted) {
-        if (result.error) {
-          toast.error(result.error)
-        } else {
-          setApplications(result.applications || [])
-        }
+        if (result.error) toast.error(result.error)
+        else setApplications(result.applications || [])
         setLoading(false)
       }
     }
@@ -50,25 +59,33 @@ export default function ApplicationsPage() {
 
   const updateStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
     const result = await updateApplicationStatus(applicationId, status)
+    if (result.error) toast.error(result.error)
+    else {
+      toast.success(`Application ${status} successfully!`)
+      await refresh()
+    }
+  }
+
+  const handleMarkComplete = async (applicationId: string) => {
+    setCompletingId(applicationId)
+    const result = await markCompletion(applicationId, 'farmer')
+    setCompletingId(null)
     if (result.error) {
       toast.error(result.error)
+    } else if (result.fullyCompleted) {
+      toast.success('Job marked as fully completed! Both parties have confirmed.')
+      await refresh()
     } else {
-      toast.success(`Application ${status} successfully!`)
-      // Refresh applications
-      const refreshResult = await getFarmerApplications()
-      if (refreshResult.applications) {
-        setApplications(refreshResult.applications)
-      }
+      toast.success('Your completion confirmed. Waiting for worker to confirm.')
+      await refresh()
     }
   }
 
   const handleRateWorker = async () => {
     if (!ratingModal) return
-
     setRatingLoading(true)
     const result = await rateUser(ratingModal.applicationId, rating, feedback, 'farmer_to_worker')
     setRatingLoading(false)
-
     if (result.error) {
       toast.error(result.error)
     } else {
@@ -76,19 +93,13 @@ export default function ApplicationsPage() {
       setRatingModal(null)
       setRating(5)
       setFeedback('')
-      // Refresh applications
-      const refreshResult = await getFarmerApplications()
-      if (refreshResult.applications) {
-        setApplications(refreshResult.applications)
-      }
+      await refresh()
     }
   }
 
-  // Group applications by job
+  // Group applications by job title
   const applicationsByJob = applications.reduce((acc, app) => {
-    if (!acc[app.job_title]) {
-      acc[app.job_title] = []
-    }
+    if (!acc[app.job_title]) acc[app.job_title] = []
     acc[app.job_title].push(app)
     return acc
   }, {} as Record<string, ApplicationWithDetails[]>)
@@ -101,11 +112,9 @@ export default function ApplicationsPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Worker Applications
-          </h1>
+          <h1 className="text-4xl font-bold text-gray-900 leading-tight">Worker Applications</h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">
-            Review anonymous applications and hire the best workers
+            Review anonymous applications, hire the best workers, and confirm job completion
           </p>
         </div>
 
@@ -132,124 +141,147 @@ export default function ApplicationsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  {jobApplications.map((app) => (
-                    <Card key={app.id} className="border border-gray-100 shadow-sm rounded-3xl overflow-hidden bg-white hover:border-blue-200 transition-all duration-300">
-                      <CardContent className="p-8">
-                        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                  {jobApplications.map((app) => {
+                    const completionStatus = getCompletionStatus(app)
+                    const isFullyCompleted = app.status === 'completed'
 
-                          {/* Worker Identity */}
-                          <div className="flex items-center gap-6">
-                            <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center shadow-inner">
-                              <span className="text-4xl font-black text-blue-600">{app.worker_first_name?.[0]?.toUpperCase()}</span>
-                            </div>
-                            <div className="space-y-2">
-                              <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">Worker Name</p>
-                              <p className="text-2xl font-bold text-gray-900">{app.worker_first_name}</p>
-                              <p className="text-sm text-gray-500">Applied {new Date(app.applied_at).toLocaleDateString()}</p>
-                            </div>
-                          </div>
+                    return (
+                      <Card key={app.id} className="border border-gray-100 shadow-sm rounded-3xl overflow-hidden bg-white hover:border-blue-200 transition-all duration-300">
+                        <CardContent className="p-8">
+                          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
 
-                          {/* Worker Stats */}
-                          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="text-center space-y-1">
-                              <div className="flex items-center justify-center gap-1">
-                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                <span className="text-lg font-bold text-gray-900">{app.worker_rating?.toFixed(1) || '0.0'}</span>
+                            {/* Worker Identity */}
+                            <div className="flex items-center gap-6">
+                              <div className="w-20 h-20 bg-blue-50 rounded-2xl flex items-center justify-center shadow-inner">
+                                <span className="text-4xl font-black text-blue-600">{app.worker_first_name?.[0]?.toUpperCase()}</span>
                               </div>
-                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Rating</p>
+                              <div className="space-y-2">
+                                <p className="text-xs font-bold text-blue-400 uppercase tracking-widest">Worker</p>
+                                <p className="text-2xl font-bold text-gray-900">{app.worker_first_name}</p>
+                                <p className="text-sm text-gray-500">Applied {new Date(app.applied_at).toLocaleDateString()}</p>
+                              </div>
                             </div>
 
-                            <div className="text-center space-y-1">
-                              <div className="flex items-center justify-center gap-1">
-                                <Briefcase className="w-4 h-4 text-green-600" />
-                                <span className="text-lg font-bold text-gray-900">{app.worker_completed_jobs}</span>
+                            {/* Worker Stats */}
+                            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6">
+                              <div className="text-center space-y-1">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                  <span className="text-lg font-bold text-gray-900">{app.worker_rating?.toFixed(1) || '0.0'}</span>
+                                </div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Rating</p>
                               </div>
-                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Jobs Done</p>
+                              <div className="text-center space-y-1">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Briefcase className="w-4 h-4 text-green-600" />
+                                  <span className="text-lg font-bold text-gray-900">{app.worker_completed_jobs}</span>
+                                </div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Jobs Done</p>
+                              </div>
+                              <div className="text-center space-y-1">
+                                <div className="flex items-center justify-center gap-1">
+                                  <MapPin className="w-4 h-4 text-red-500" />
+                                  <span className="text-lg font-bold text-gray-900">{app.distance ? `${app.distance}km` : '--'}</span>
+                                </div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Distance</p>
+                              </div>
+                              <div className="text-center space-y-1">
+                                <div className="flex items-center justify-center gap-1">
+                                  <Tag className="w-4 h-4 text-purple-500" />
+                                  <span className="text-lg font-bold text-gray-900">{app.worker_skills?.length || 0}</span>
+                                </div>
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Skills</p>
+                              </div>
                             </div>
 
-                            <div className="text-center space-y-1">
-                              <div className="flex items-center justify-center gap-1">
-                                <MapPin className="w-4 h-4 text-red-500" />
-                                <span className="text-lg font-bold text-gray-900">{app.distance ? `${app.distance}km` : '--'}</span>
-                              </div>
-                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Distance</p>
-                            </div>
-
-                            <div className="text-center space-y-1">
-                              <div className="flex items-center justify-center gap-1">
-                                <Tag className="w-4 h-4 text-purple-500" />
-                                <span className="text-lg font-bold text-gray-900">{app.worker_skills?.length || 0}</span>
-                              </div>
+                            {/* Skills Tags */}
+                            <div className="flex-1 space-y-3">
                               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Skills</p>
+                              <div className="flex flex-wrap gap-2">
+                                {app.worker_skills?.slice(0, 4).map((skill, index) => (
+                                  <span key={index} className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-lg border border-purple-100">
+                                    {skill}
+                                  </span>
+                                )) || <span className="text-sm text-gray-400 italic">No skills listed</span>}
+                              </div>
                             </div>
-                          </div>
 
-                          {/* Skills Tags */}
-                          <div className="flex-1 space-y-3">
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Skills</p>
-                            <div className="flex flex-wrap gap-2">
-                              {app.worker_skills?.slice(0, 4).map((skill, index) => (
-                                <span key={index} className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-lg border border-purple-100">
-                                  {skill}
-                                </span>
-                              )) || (
-                                <span className="text-sm text-gray-400 italic">No skills listed</span>
+                            {/* Status & Actions */}
+                            <div className="flex flex-col gap-3 min-w-[220px]">
+                              {/* Status Badge */}
+                              <div className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-center border ${
+                                isFullyCompleted ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                                completionStatus === 'pending_worker' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                completionStatus === 'pending_farmer' ? 'bg-orange-50 text-orange-700 border-orange-100' :
+                                app.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
+                                app.status === 'accepted' ? 'bg-green-50 text-green-700 border-green-100' :
+                                'bg-red-50 text-red-700 border-red-100'
+                              }`}>
+                                {isFullyCompleted ? '✓ Completed' :
+                                 completionStatus === 'pending_worker' ? '⏳ Waiting for Worker' :
+                                 completionStatus === 'pending_farmer' ? '👆 Worker Confirmed' :
+                                 app.status}
+                              </div>
+
+                              {/* Accept / Reject */}
+                              {app.status === 'pending' && (
+                                <div className="flex gap-2">
+                                  <Button
+                                    onClick={() => updateStatus(app.id, 'accepted')}
+                                    className="flex-1 h-11 bg-green-600 hover:bg-green-700 rounded-xl text-sm font-bold"
+                                  >
+                                    <CheckCircle2 className="w-4 h-4 mr-1" /> Accept
+                                  </Button>
+                                  <Button
+                                    onClick={() => updateStatus(app.id, 'rejected')}
+                                    variant="outline"
+                                    className="flex-1 h-11 rounded-xl border-red-200 text-red-600 hover:bg-red-50"
+                                  >
+                                    <XCircle className="w-4 h-4 mr-1" /> Reject
+                                  </Button>
+                                </div>
+                              )}
+
+                              {/* Mark Complete — only for accepted, farmer not yet confirmed */}
+                              {app.status === 'accepted' && !app.farmer_completed && (
+                                <Button
+                                  onClick={() => handleMarkComplete(app.id)}
+                                  disabled={completingId === app.id}
+                                  className="w-full h-11 bg-blue-600 hover:bg-blue-700 rounded-xl text-sm font-bold"
+                                >
+                                  <CheckCheck className="w-4 h-4 mr-2" />
+                                  {completingId === app.id ? 'Confirming...' : 'Mark as Complete'}
+                                </Button>
+                              )}
+
+                              {/* Rate Worker — only after both sides confirmed */}
+                              {isFullyCompleted && !app.farmer_rated_worker && (
+                                <Button
+                                  onClick={() => setRatingModal({ open: true, applicationId: app.id, workerName: app.worker_first_name })}
+                                  className="w-full h-11 bg-yellow-600 hover:bg-yellow-700 rounded-xl text-sm font-bold"
+                                >
+                                  <Star className="w-4 h-4 mr-2" /> Rate Worker
+                                </Button>
+                              )}
+
+                              {isFullyCompleted && app.farmer_rated_worker && (
+                                <div className="text-center text-xs font-bold text-green-600 bg-green-50 px-3 py-2 rounded-xl border border-green-100">
+                                  ✓ Worker Rated
+                                </div>
+                              )}
+
+                              {app.status === 'accepted' && !isFullyCompleted && app.farmer_completed && (
+                                <p className="text-center text-xs text-gray-400 font-medium">
+                                  Waiting for worker to confirm completion
+                                </p>
                               )}
                             </div>
+
                           </div>
-
-                          {/* Status & Actions */}
-                          <div className="flex flex-col gap-4 min-w-[200px]">
-                            <div className={`px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest text-center border ${
-                              app.job_status === 'completed' && app.status === 'accepted' ? 'bg-purple-50 text-purple-700 border-purple-100' :
-                              app.status === 'pending' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
-                              app.status === 'accepted' ? 'bg-green-50 text-green-700 border-green-100' :
-                              'bg-red-50 text-red-700 border-red-100'
-                            }`}>
-                              {app.job_status === 'completed' && app.status === 'accepted' ? 'Job Completed' : app.status}
-                            </div>
-
-                            {app.status === 'pending' && app.job_status !== 'completed' && (
-                              <div className="flex gap-3">
-                                <Button
-                                  onClick={() => updateStatus(app.id, 'accepted')}
-                                  className="flex-1 h-12 bg-green-600 hover:bg-green-700 rounded-xl text-sm font-bold"
-                                >
-                                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                                  Accept
-                                </Button>
-                                <Button
-                                  onClick={() => updateStatus(app.id, 'rejected')}
-                                  variant="outline"
-                                  className="flex-1 h-12 rounded-xl border-red-200 text-red-600 hover:bg-red-50"
-                                >
-                                  <XCircle className="w-4 h-4 mr-2" />
-                                  Reject
-                                </Button>
-                              </div>
-                            )}
-
-                            {app.status === 'accepted' && app.job_status === 'completed' && !app.farmer_rated_worker && (
-                              <Button
-                                onClick={() => setRatingModal({ open: true, applicationId: app.id, workerCode: app.worker_first_name || app.worker_code })}
-                                className="w-full h-12 bg-yellow-600 hover:bg-yellow-700 rounded-xl text-sm font-bold"
-                              >
-                                <Star className="w-4 h-4 mr-2" />
-                                Rate Worker
-                              </Button>
-                            )}
-                            
-                            {app.status === 'accepted' && app.job_status !== 'completed' && (
-                              <div className="text-center text-xs font-bold text-gray-400 mt-2">
-                                Job active. Rating unlocks after completion.
-                              </div>
-                            )}
-                          </div>
-
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                        </CardContent>
+                      </Card>
+                    )
+                  })}
                 </div>
               </div>
             ))}
@@ -265,26 +297,20 @@ export default function ApplicationsPage() {
               <div className="space-y-6">
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-gray-900">Rate Worker</h3>
-                  <p className="text-gray-500 mt-2">Worker Name: <span className="font-bold text-blue-600">{ratingModal.workerCode}</span></p>
+                  <p className="text-gray-500 mt-2">Rating <span className="font-bold text-blue-600">{ratingModal.workerName}</span></p>
                 </div>
 
-                {/* Star Rating */}
                 <div className="space-y-3">
                   <p className="text-sm font-bold text-gray-700">Rating</p>
                   <div className="flex justify-center gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => setRating(star)}
-                        className="text-3xl"
-                      >
+                      <button key={star} onClick={() => setRating(star)}>
                         <Star className={`w-8 h-8 ${star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`} />
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Feedback */}
                 <div className="space-y-3">
                   <p className="text-sm font-bold text-gray-700">Feedback</p>
                   <select
@@ -301,21 +327,11 @@ export default function ApplicationsPage() {
                   </select>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-3">
-                  <Button
-                    onClick={() => setRatingModal(null)}
-                    variant="outline"
-                    className="flex-1"
-                    disabled={ratingLoading}
-                  >
+                  <Button onClick={() => setRatingModal(null)} variant="outline" className="flex-1" disabled={ratingLoading}>
                     Cancel
                   </Button>
-                  <Button
-                    onClick={handleRateWorker}
-                    className="flex-1 bg-yellow-600 hover:bg-yellow-700"
-                    disabled={ratingLoading}
-                  >
+                  <Button onClick={handleRateWorker} className="flex-1 bg-yellow-600 hover:bg-yellow-700" disabled={ratingLoading}>
                     {ratingLoading ? "Rating..." : "Submit Rating"}
                   </Button>
                 </div>

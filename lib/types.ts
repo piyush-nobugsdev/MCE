@@ -110,6 +110,8 @@ export interface ApplicationWithDetails {
   worker_skills: string[];
   distance: number | null;
   farmer_rated_worker?: boolean;
+  farmer_completed?: boolean;
+  worker_completed?: boolean;
   message?: string | null;
 }
 
@@ -126,5 +128,7 @@ export interface WorkerApplicationDetails {
   farmer_code: string;
   farmer_first_name: string;
   farmer_farm_name: string;
+  farmer_completed?: boolean;
+  worker_completed?: boolean;
 }
 
