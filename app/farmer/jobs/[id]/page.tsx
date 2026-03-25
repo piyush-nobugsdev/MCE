@@ -110,9 +110,9 @@ export default function JobManagementPage() {
               <div className="space-y-4 flex-1">
                  <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest border ${
-                       job.status === 'posted' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-green-50 text-green-700 border-green-100'
+                       job.status === 'open' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-green-50 text-green-700 border-green-100'
                     }`}>
-                      {job.status === 'posted' ? 'Open' : job.status}
+                      {job.status === 'open' ? 'Open' : job.status}
                     </span>
                     <span className="text-xs font-bold text-gray-300 flex items-center gap-2">
                        <Clock className="w-4 h-4" /> Posted {new Date(job.created_at).toLocaleDateString()}

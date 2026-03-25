@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FarmerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { Plus, Briefcase, Users, Star, IndianRupee, ChevronRight } from 'lucide-react'
+import { Plus, Briefcase, Users, Star, IndianRupee, ChevronRight, MapPin } from 'lucide-react'
 import { Farmer, Job } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 
@@ -53,7 +53,7 @@ export default function FarmerDashboard() {
     </div>
   )
 
-  const activeJobs = jobs.filter((j) => j.status === 'posted').length
+  const activeJobs = jobs.filter((j) => j.status === 'open').length
   const completedJobs = jobs.filter((j) => j.status === 'completed').length
 
   return (
@@ -115,13 +115,13 @@ export default function FarmerDashboard() {
             </Button>
           </Link>
 
-          <Link href="/farmer/applications">
+          <Link href="/farmer/farms">
             <Button variant="outline" className="w-full h-24 rounded-3xl border-2 border-gray-100 bg-white hover:bg-gray-50 flex items-center justify-between px-8">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                  <MapPin className="w-6 h-6 text-green-600" />
                 </div>
-                <span className="text-xl font-bold text-gray-900">{t('applications')}</span>
+                <span className="text-xl font-bold text-gray-900">Manage My Farms</span>
               </div>
               <ChevronRight className="w-6 h-6 opacity-10 text-gray-900" />
             </Button>
@@ -147,9 +147,9 @@ export default function FarmerDashboard() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                          job.status === 'posted' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                          job.status === 'open' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
                         }`}>
-                          {job.status === 'posted' ? 'Live' : 'Closed'}
+                          {job.status === 'open' ? 'Live' : 'Closed'}
                         </span>
                         <span className="text-xs font-bold text-gray-400">📍 {typeof job.location === 'string' ? job.location : job.location?.name}</span>
                       </div>

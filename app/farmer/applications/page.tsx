@@ -24,7 +24,7 @@ export default function ApplicationsPage() {
       const { data, error } = await supabase
         .from('applications')
         .select(`
-          id, status, message, job_id, worker_id,
+          id, status, job_id, worker_id,
           jobs!inner(title),
           workers!inner(first_name, age, experience, rating)
         `)
@@ -36,7 +36,7 @@ export default function ApplicationsPage() {
         const flattened = data.map((app: any) => ({
           id: app.id,
           status: app.status,
-          message: app.message,
+          message: null, // No message column in applications table
           job_id: app.job_id,
           worker_id: app.worker_id,
           job_title: app.jobs.title,

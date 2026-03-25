@@ -1,4 +1,10 @@
--- Create users table (extends Supabase auth)
+-- Enable extensions
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
+--------------------------------------------------
+-- USERS TABLE (linked with Supabase Auth)
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   phone VARCHAR(20) UNIQUE,
@@ -7,159 +13,239 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create farmers table
+--------------------------------------------------
+-- FARMERS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS farmers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
   first_name VARCHAR(120) NOT NULL,
-  last_name  VARCHAR(120) NOT NULL,
-  full_name  VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
+  last_name VARCHAR(120) NOT NULL,
+
+  full_name VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
+
   village VARCHAR(255) NOT NULL,
   district VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,
-  farm_location JSONB, -- {lat: number, lng: number}
+
+  farm_location JSONB,
+
   rating DECIMAL(3,2) DEFAULT 0,
   total_jobs_posted INTEGER DEFAULT 0,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create workers table
+--------------------------------------------------
+-- WORKERS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS workers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+  user_id UUID UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
   first_name VARCHAR(120) NOT NULL,
-  last_name  VARCHAR(120) NOT NULL,
-  full_name  VARCHAR(255) GENERATED ALWAYS AS (
-    CASE WHEN last_name = '' THEN first_name
-         ELSE first_name || ' ' || last_name
-    END
-  ) STORED,
+  last_name VARCHAR(120) NOT NULL,
+
+  full_name VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
+
   age INTEGER,
-  experience INTEGER, -- in years
+  experience INTEGER,
+
   village VARCHAR(255) NOT NULL,
   district VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,
-  home_location JSONB, -- {lat: number, lng: number}
-  skills TEXT[], -- ARRAY of skill tags
-  travel_distance_preference INTEGER, -- in km
+
+  home_location JSONB,
+
+  skills TEXT[],
+  travel_distance_preference INTEGER,
+
   rating DECIMAL(3,2) DEFAULT 0,
   total_jobs_completed INTEGER DEFAULT 0,
   total_earned DECIMAL(10,2) DEFAULT 0,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create jobs table
+--------------------------------------------------
+-- JOBS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   farmer_id UUID NOT NULL REFERENCES farmers(id) ON DELETE CASCADE,
+
   title VARCHAR(255) NOT NULL,
   category VARCHAR(100) NOT NULL,
-  date_range JSONB, -- {start_date: string, end_date: string}
+
+  date_range JSONB,
+
   start_time TIME,
   end_time TIME,
-  workers_needed INTEGER NOT NULL,
+
+  workers_needed INTEGER NOT NULL CHECK (workers_needed > 0),
+
   description TEXT,
-  location JSONB, -- {lat: number, lng: number}
-  wage_type VARCHAR(50), -- hourly, daily, per_task
+
+  location JSONB,
+
+  wage_type VARCHAR(50),
   wage_amount DECIMAL(10,2) NOT NULL,
+
   is_negotiable BOOLEAN DEFAULT FALSE,
   meals_provided BOOLEAN DEFAULT FALSE,
   transport_provided BOOLEAN DEFAULT FALSE,
+
   farmer_code VARCHAR(6) UNIQUE,
-  status VARCHAR(50) DEFAULT 'open', -- open, in_progress, completed, cancelled
+
+  status VARCHAR(50) DEFAULT 'open'
+    CHECK (status IN ('open','in_progress','completed','cancelled')),
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create applications table
+--------------------------------------------------
+-- APPLICATIONS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS applications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   worker_id UUID NOT NULL REFERENCES workers(id) ON DELETE CASCADE,
-  worker_code VARCHAR(6), -- temporary code for anonymous tracking
-  status VARCHAR(50) DEFAULT 'pending', -- pending, accepted, rejected, completed
+
+  worker_code VARCHAR(6),
+
+  status VARCHAR(50) DEFAULT 'pending'
+    CHECK (status IN ('pending','accepted','rejected','completed')),
+
   applied_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  updated_at TIMESTAMP DEFAULT NOW(),
+
+  UNIQUE(job_id, worker_id)
 );
 
--- Create attendance table
+--------------------------------------------------
+-- ATTENDANCE TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS attendance (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
-  worker_code VARCHAR(6),
+
   attendance_confirmed_farmer BOOLEAN DEFAULT FALSE,
   attendance_confirmed_worker BOOLEAN DEFAULT FALSE,
+
   confirmed_at TIMESTAMP,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create payments table
+--------------------------------------------------
+-- PAYMENTS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   job_id UUID NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   application_id UUID NOT NULL REFERENCES applications(id) ON DELETE CASCADE,
+
   amount DECIMAL(10,2) NOT NULL,
-  payment_method VARCHAR(50), -- cash, upi, bank_transfer
-  payment_status VARCHAR(50) DEFAULT 'pending', -- pending, completed, failed
+
+  payment_method VARCHAR(50),
+  payment_status VARCHAR(50) DEFAULT 'pending'
+    CHECK (payment_status IN ('pending','completed','failed')),
+
   paid_at TIMESTAMP,
+
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create ratings table
+--------------------------------------------------
+-- RATINGS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS ratings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   rater_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   ratee_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+
+  rating INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+
   feedback TEXT,
-  type VARCHAR(50), -- farmer_to_worker, worker_to_farmer
+
+  type VARCHAR(50),
+
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create reports table
+--------------------------------------------------
+-- REPORTS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   reporter_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   reported_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+
   reason VARCHAR(255) NOT NULL,
   details TEXT,
+
   status VARCHAR(50) DEFAULT 'pending',
+
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create notifications table
+--------------------------------------------------
+-- NOTIFICATIONS TABLE
+--------------------------------------------------
+
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  type VARCHAR(100), -- job_applied, application_accepted, attendance_confirmed, payment_received, rating_received
+
+  type VARCHAR(100),
   title VARCHAR(255) NOT NULL,
   message TEXT NOT NULL,
-  related_id UUID, -- job_id or application_id
+
+  related_id UUID,
+
   read_at TIMESTAMP,
+
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Create indexes for performance
-CREATE INDEX idx_farmers_user_id ON farmers(user_id);
-CREATE INDEX idx_workers_user_id ON workers(user_id);
-CREATE INDEX idx_jobs_farmer_id ON jobs(farmer_id);
-CREATE INDEX idx_jobs_status ON jobs(status);
-CREATE INDEX idx_applications_job_id ON applications(job_id);
-CREATE INDEX idx_applications_worker_id ON applications(worker_id);
-CREATE INDEX idx_applications_status ON applications(status);
-CREATE INDEX idx_attendance_job_id ON attendance(job_id);
-CREATE INDEX idx_attendance_application_id ON attendance(application_id);
-CREATE INDEX idx_payments_job_id ON payments(job_id);
-CREATE INDEX idx_ratings_rater_id ON ratings(rater_id);
-CREATE INDEX idx_notifications_user_id ON notifications(user_id);
-CREATE INDEX idx_notifications_read_at ON notifications(read_at);
+--------------------------------------------------
+-- INDEXES
+--------------------------------------------------
 
--- Enable RLS on tables
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_jobs_farmer_id ON jobs(farmer_id);
+
+CREATE INDEX IF NOT EXISTS idx_applications_job ON applications(job_id);
+CREATE INDEX IF NOT EXISTS idx_applications_worker ON applications(worker_id);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+
+--------------------------------------------------
+-- ENABLE RLS
+--------------------------------------------------
+
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE farmers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE workers ENABLE ROW LEVEL SECURITY;
@@ -171,92 +257,22 @@ ALTER TABLE ratings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies for users table
-CREATE POLICY "Users can view own data" ON users FOR SELECT
-  USING (auth.uid() = id);
+--------------------------------------------------
+-- RLS POLICIES (BASIC EXAMPLES)
+--------------------------------------------------
 
-CREATE POLICY "Users can update own data" ON users FOR UPDATE
-  USING (auth.uid() = id);
+-- Jobs: Anyone can read open jobs
+CREATE POLICY "Anyone can read open jobs" ON jobs
+  FOR SELECT USING (status = 'open');
 
--- RLS Policies for farmers table
-CREATE POLICY "Anyone can view farmer profiles" ON farmers FOR SELECT
-  USING (true);
+-- Jobs: Farmers can manage their own jobs
+CREATE POLICY "Farmers can manage own jobs" ON jobs
+  FOR ALL USING (farmer_id IN (SELECT id FROM farmers WHERE user_id = auth.uid()));
 
-CREATE POLICY "Farmers can update own profile" ON farmers FOR UPDATE
-  USING (auth.uid() = user_id);
+-- Applications: Workers can manage their own applications
+CREATE POLICY "Workers can manage own applications" ON applications
+  FOR ALL USING (worker_id IN (SELECT id FROM workers WHERE user_id = auth.uid()));
 
-CREATE POLICY "Farmers can insert own profile" ON farmers FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
--- RLS Policies for workers table
-CREATE POLICY "Anyone can view worker profiles" ON workers FOR SELECT
-  USING (true);
-
-CREATE POLICY "Workers can update own profile" ON workers FOR UPDATE
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Workers can insert own profile" ON workers FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
--- RLS Policies for jobs table
-CREATE POLICY "Anyone can view jobs" ON jobs FOR SELECT
-  USING (true);
-
-CREATE POLICY "Farmers can insert own jobs" ON jobs FOR INSERT
-  WITH CHECK (auth.uid() IN (SELECT user_id FROM farmers WHERE id = farmer_id));
-
-CREATE POLICY "Farmers can update own jobs" ON jobs FOR UPDATE
-  USING (auth.uid() IN (SELECT user_id FROM farmers WHERE id = farmer_id));
-
-CREATE POLICY "Farmers can delete own jobs" ON jobs FOR DELETE
-  USING (auth.uid() IN (SELECT user_id FROM farmers WHERE id = farmer_id));
-
--- RLS Policies for applications table
-CREATE POLICY "Anyone can view applications" ON applications FOR SELECT
-  USING (true);
-
-CREATE POLICY "Workers can insert applications" ON applications FOR INSERT
-  WITH CHECK (auth.uid() IN (SELECT user_id FROM workers WHERE id = worker_id));
-
-CREATE POLICY "Workers and farmers can update applications" ON applications FOR UPDATE
-  USING (
-    auth.uid() IN (SELECT user_id FROM workers WHERE id = worker_id) OR
-    auth.uid() IN (SELECT user_id FROM farmers WHERE id IN (SELECT farmer_id FROM jobs WHERE id = job_id))
-  );
-
--- RLS Policies for attendance table
-CREATE POLICY "Anyone can view attendance" ON attendance FOR SELECT
-  USING (true);
-
-CREATE POLICY "Workers and farmers can manage attendance" ON attendance FOR INSERT
-  WITH CHECK (
-    auth.uid() IN (SELECT user_id FROM workers WHERE worker_code = attendance.worker_code) OR
-    auth.uid() IN (SELECT user_id FROM farmers WHERE id IN (SELECT farmer_id FROM jobs WHERE id = job_id))
-  );
-
-CREATE POLICY "Workers and farmers can update attendance" ON attendance FOR UPDATE
-  USING (
-    auth.uid() IN (SELECT user_id FROM workers WHERE worker_code = attendance.worker_code) OR
-    auth.uid() IN (SELECT user_id FROM farmers WHERE id IN (SELECT farmer_id FROM jobs WHERE id = job_id))
-  );
-
--- RLS Policies for payments table
-CREATE POLICY "Anyone can view payments" ON payments FOR SELECT
-  USING (true);
-
-CREATE POLICY "Farmers can insert payments" ON payments FOR INSERT
-  WITH CHECK (auth.uid() IN (SELECT user_id FROM farmers WHERE id IN (SELECT farmer_id FROM jobs WHERE id = job_id)));
-
--- RLS Policies for ratings table
-CREATE POLICY "Anyone can view ratings" ON ratings FOR SELECT
-  USING (true);
-
-CREATE POLICY "Users can create ratings" ON ratings FOR INSERT
-  WITH CHECK (auth.uid() = rater_id);
-
--- RLS Policies for notifications table
-CREATE POLICY "Users can view own notifications" ON notifications FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Service role can insert notifications" ON notifications FOR INSERT
-  WITH CHECK (true);
+-- Applications: Farmers can see applications for their jobs
+CREATE POLICY "Farmers can see job applications" ON applications
+  FOR SELECT USING (job_id IN (SELECT id FROM jobs WHERE farmer_id IN (SELECT id FROM farmers WHERE user_id = auth.uid())));

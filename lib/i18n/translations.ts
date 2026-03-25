@@ -12,6 +12,7 @@ export const translations = {
     save: 'SAVE CHANGES',
     cancel: 'CANCEL',
     loading: 'LOADING...',
+    add_new: 'ADD NEW',
     
     // Role Selection
     select_role: 'CHOOSE YOUR ROLE TO GET STARTED',
@@ -77,6 +78,7 @@ export const translations = {
     save: 'बदलाव सहेजें',
     cancel: 'रद्द करें',
     loading: 'लोड हो रहा है...',
+    add_new: 'नया जोड़ें',
 
     // Role Selection
     select_role: 'शुरू करने के लिए अपनी भूमिका चुनें',
@@ -142,6 +144,7 @@ export const translations = {
     save: 'ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ',
     cancel: 'ರದ್ದುಮಾಡಿ',
     loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
+    add_new: 'ಹೊಸ ಸೇರಿಸಿ',
 
     // Role Selection
     select_role: 'ಪ್ರಾರಂಭಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',

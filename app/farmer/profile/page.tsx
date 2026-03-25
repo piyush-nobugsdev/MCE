@@ -15,20 +15,30 @@ export default function FarmerProfilePage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    let isMounted = true
     const fetchProfile = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data } = await supabase
-          .from('farmers')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle()
-        setProfile({ ...data, phone: user.phone })
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user && isMounted) {
+          const { data } = await supabase
+            .from('farmers')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+          
+          if (isMounted) {
+            setProfile({ ...data, phone: user.phone })
+          }
+        }
+      } catch (error) {
+        console.error('Profile fetch error:', error)
+      } finally {
+        if (isMounted) setLoading(false)
       }
-      setLoading(false)
     }
     fetchProfile()
+    return () => { isMounted = false }
   }, [])
 
   const handleSignOut = async () => {

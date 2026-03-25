@@ -88,7 +88,7 @@ export default function FarmerJobsPage() {
                       <div className="space-y-1">
                         <div className="flex items-center gap-3">
                            <span className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-widest ${
-                             job.status === 'posted' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
+                             job.status === 'open' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 
                              job.status === 'in_progress' ? 'bg-yellow-50 text-yellow-700 border border-yellow-100' : 'bg-green-50 text-green-700 border border-green-100'
                            }`}>
                              {job.status}

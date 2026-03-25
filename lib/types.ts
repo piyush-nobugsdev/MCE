@@ -1,14 +1,14 @@
 // User roles
 export type UserRole = 'farmer' | 'worker' | 'admin'
-export type JobStatus = 'posted' | 'in_progress' | 'completed' | 'cancelled'
-export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
-export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded'
+export type JobStatus = 'open' | 'in_progress' | 'completed' | 'cancelled'
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'completed'
+export type PaymentStatus = 'pending' | 'completed' | 'failed'
 
 // Database Types
 export interface User {
   id: string
-  email: string
   phone: string | null
+  auth_provider: string | null
   created_at: string
   updated_at: string
 }
@@ -18,13 +18,14 @@ export interface Farmer {
   user_id: string
   first_name: string
   last_name: string
-  full_name: string        // generated: first_name + ' ' + last_name
-  farm_name: string
-  location: string
-  latitude: number
-  longitude: number
-  bio: string | null
-  avatar_url: string | null
+  full_name: string
+  village: string
+  district: string
+  state: string
+  farm_location: {
+    lat: number
+    lng: number
+  } | null
   rating: number
   total_jobs_posted: number
   created_at: string
@@ -37,17 +38,20 @@ export interface Worker {
   first_name: string
   last_name: string
   full_name: string
-  age: number | null
-  experience: number | null
-  location: string
-  latitude: number
-  longitude: number
-  bio: string | null
-  avatar_url: string | null
+  age?: number | null      // Not in SQL, but good to have if we keep UI
+  experience?: number | null // Not in SQL, but good to have if we keep UI
+  village: string
+  district: string
+  state: string
+  home_location: {
+    lat: number
+    lng: number
+  } | null
   skills: string[]
+  travel_distance_preference: number | null
   rating: number
+  total_jobs_completed: number
   total_earned: number
-  anonymous_code: string
   created_at: string
   updated_at: string
 }
@@ -56,20 +60,26 @@ export interface Job {
   id: string
   farmer_id: string
   title: string
-  description: string
+  category: string
+  description: string | null
+  date_range: {
+    start_date: string
+    end_date: string
+  } | null
+  start_time: string | null
+  end_time: string | null
+  workers_needed: number
   location: {
     lat: number
     lng: number
     name: string
-  } | string
-  latitude?: number
-  longitude?: number
-  category: string
-  workers_needed: number
+  } | null
+  wage_type: string | null
   wage_amount: number
-  wage_type?: string
-  start_date: string
-  end_date: string
+  is_negotiable: boolean
+  meals_provided: boolean
+  transport_provided: boolean
+  farmer_code: string | null
   status: JobStatus
   created_at: string
   updated_at: string
@@ -79,20 +89,20 @@ export interface JobApplication {
   id: string
   job_id: string
   worker_id: string
+  worker_code: string | null
   status: ApplicationStatus
-  proposed_wage: number | null
-  message: string | null
-  created_at: string
+  message?: string | null
+  applied_at: string
   updated_at: string
 }
 
 export interface Attendance {
   id: string
   job_id: string
-  worker_id: string
-  date: string
-  hours_worked: number
-  confirmed_by_farmer: boolean
+  application_id: string
+  attendance_confirmed_farmer: boolean
+  attendance_confirmed_worker: boolean
+  confirmed_at: string | null
   created_at: string
   updated_at: string
 }
@@ -100,10 +110,11 @@ export interface Attendance {
 export interface Payment {
   id: string
   job_id: string
-  worker_id: string
+  application_id: string
   amount: number
-  status: PaymentStatus
-  paid_date: string | null
+  payment_method: string | null
+  payment_status: PaymentStatus
+  paid_at: string | null
   created_at: string
   updated_at: string
 }
@@ -111,33 +122,21 @@ export interface Payment {
 export interface Rating {
   id: string
   rater_id: string
-  rated_user_id: string
+  ratee_id: string
   rating: number
-  review: string | null
+  feedback: string | null
+  type: string | null
   created_at: string
-  updated_at: string
-}
-
-export interface Report {
-  id: string
-  reporter_id: string
-  reported_user_id: string
-  job_id: string | null
-  reason: string
-  description: string
-  status: 'pending' | 'reviewed' | 'resolved'
-  created_at: string
-  updated_at: string
 }
 
 export interface Notification {
   id: string
   user_id: string
+  type: string | null
   title: string
   message: string
-  type: 'job' | 'application' | 'payment' | 'rating' | 'system'
-  read: boolean
-  action_url: string | null
+  related_id: string | null
+  read_at: string | null
   created_at: string
 }
 
@@ -149,7 +148,7 @@ export interface ApplicationWithDetails {
   worker_id: string
   job_title: string
   worker_first_name: string
-  worker_age: number | null
-  worker_experience: number | null
+  worker_age?: number | null
+  worker_experience?: number | null
   worker_rating: number | null
 }
