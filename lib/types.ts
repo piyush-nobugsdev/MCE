@@ -16,7 +16,9 @@ export interface User {
 export interface Farmer {
   id: string
   user_id: string
-  name: string
+  first_name: string
+  last_name: string
+  full_name: string        // generated: first_name + ' ' + last_name
   farm_name: string
   location: string
   latitude: number
@@ -32,7 +34,9 @@ export interface Farmer {
 export interface Worker {
   id: string
   user_id: string
-  name: string
+  first_name: string
+  last_name: string
+  full_name: string        // generated: first_name + ' ' + last_name
   location: string
   latitude: number
   longitude: number

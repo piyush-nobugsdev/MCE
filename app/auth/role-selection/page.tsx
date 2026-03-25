@@ -20,7 +20,7 @@ export default function RoleSelectionPage() {
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Farmer Card */}
-          <Link href="/auth/farmer-signup">
+          <Link href="/auth/farmer/login">
             <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
@@ -42,7 +42,7 @@ export default function RoleSelectionPage() {
           </Link>
 
           {/* Worker Card */}
-          <Link href="/auth/worker-signup">
+          <Link href="/auth/worker/login">
             <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
