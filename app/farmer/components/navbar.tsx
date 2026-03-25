@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { signOut } from '@/app/actions/auth'
 import { Button } from '@/components/ui/button'
-import { Menu, X, Home, Briefcase, Users, LogOut, User, Globe, ChevronDown } from 'lucide-react'
+import { Menu, X, Home, Briefcase, Users, LogOut, User, Globe, ChevronDown, Library, HeartHandshake } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { useLanguage } from '@/lib/i18n/context'
@@ -19,6 +19,8 @@ export function FarmerNavbar() {
     { href: '/farmer/dashboard', label: t('home'), icon: Home },
     { href: '/farmer/jobs', label: t('tasks'), icon: Briefcase },
     { href: '/farmer/applications', label: t('applications'), icon: Users },
+    { href: '/farmer/samman-kendra', label: t('samman_kendra'), icon: Library },
+    { href: '/farmer/sahyog-kendra', label: t('sahyog_kendra'), icon: HeartHandshake },
   ]
 
   const handleSignOut = async () => {
@@ -39,7 +41,7 @@ export function FarmerNavbar() {
           <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-md shadow-green-100 group-hover:rotate-6 transition-transform">
             <span className="text-white font-bold text-lg">F</span>
           </div>
-          <span className="text-xl font-bold text-gray-900">Smart Resource</span>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">FarmWorks</span>
         </Link>
 
         {/* Desktop Nav */}

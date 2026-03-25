@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Farm Work Marketplace - Connect Farmers & Workers',
+  title: 'FarmWorks - Connect Farmers & Workers',
   description: 'Find/post farm jobs easily. A marketplace for agricultural success.',
   generator: 'v0.app',
   icons: {

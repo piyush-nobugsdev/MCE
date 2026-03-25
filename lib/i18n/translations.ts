@@ -13,6 +13,8 @@ export const translations = {
     cancel: 'CANCEL',
     loading: 'LOADING...',
     add_new: 'ADD NEW',
+    samman_kendra: 'SAMMAN KENDRA',
+    sahyog_kendra: 'SAHYOG KENDRA',
     
     // Role Selection
     select_role: 'CHOOSE YOUR ROLE TO GET STARTED',
@@ -66,6 +68,43 @@ export const translations = {
     yes: 'YES',
     no: 'NO',
     sign_out: 'SIGN OUT',
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'SIGN IN',
+    home_title: 'Fair work, fair pay',
+    home_subtitle: 'A marketplace connecting farmers and workers directly. Post jobs, find work, earn fairly.',
+    get_started: 'GET STARTED',
+    learn_more: 'LEARN MORE',
+    
+    // Features
+    feature_1_title: 'Farmer & Worker Community',
+    feature_1_desc: 'Direct connections between farmers and workers. Build lasting relationships and grow together without intermediaries.',
+    feature_2_title: 'Fair Wages, Full Transparency',
+    feature_2_desc: 'See wages upfront, no hidden fees. Workers know exactly what they\'ll earn. Farmers post honest rates.',
+    feature_3_title: 'Speak Your Language',
+    feature_3_desc: 'Support for English, Hindi, and Kannada. Connect and communicate in the language you\'re most comfortable with.',
+    feature_4_title: 'Preview Before You Commit',
+    feature_4_desc: 'Farmers preview applications. Workers preview jobs. Make informed decisions with full transparency.',
+    
+    // How it works
+    how_it_works: 'How it works',
+    for_farmers: 'For Farmers',
+    for_workers: 'For Workers',
+    farmer_step_1: 'Create your profile',
+    farmer_step_2: 'Post a job',
+    farmer_step_3: 'Review applications',
+    farmer_step_4: 'Hire and manage',
+    farmer_step_5: 'Process payments',
+    
+    worker_step_1: 'Create your profile',
+    worker_step_2: 'Browse nearby jobs',
+    worker_step_3: 'Apply to work',
+    worker_step_4: 'Get hired',
+    worker_step_5: 'Get paid',
+
+    ready_to_start: "Ready to get started?",
+    signup_cta: "Join thousands of farmers and workers who are building better opportunities.",
   },
   hi: {
     // Shared
@@ -79,6 +118,8 @@ export const translations = {
     cancel: 'रद्द करें',
     loading: 'लोड हो रहा है...',
     add_new: 'नया जोड़ें',
+    samman_kendra: 'सम्मान केंद्र',
+    sahyog_kendra: 'सहयोग केंद्र',
 
     // Role Selection
     select_role: 'शुरू करने के लिए अपनी भूमिका चुनें',
@@ -132,6 +173,43 @@ export const translations = {
     yes: 'हाँ',
     no: 'नहीं',
     sign_out: 'लॉग आउट',
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'लॉग इन करें',
+    home_title: 'निष्पक्ष काम, निष्पक्ष वेतन',
+    home_subtitle: 'किसान और श्रमिकों को सीधे जोड़ने वाला एक बाज़ार। काम पोस्ट करें, काम खोजें, निष्पक्ष रूप से कमाएं।',
+    get_started: 'शुरुआत करें',
+    learn_more: 'और जानें',
+    
+    // Features
+    feature_1_title: 'किसान और श्रमिक समुदाय',
+    feature_1_desc: 'किसान और श्रमिकों के बीच सीधा संपर्क। बिना बिचौलियों के संबंध बनाएं और साथ बढ़ें।',
+    feature_2_title: 'निष्पक्ष मजदूरी, पूरी पारदर्शिता',
+    feature_2_desc: 'मजदूरी पहले से देखें, कोई छिपी फीस नहीं। श्रमिकों को पता है कि उन्हें क्या मिलेगा। किसान ईमानदार दरें पोस्ट करते हैं।',
+    feature_3_title: 'अपनी भाषा में बात करें',
+    feature_3_desc: 'अंग्रेजी, हिंदी और कन्नड़ के लिए समर्थन। उस भाषा में जुड़ें जिसमें आप सबसे ज्यादा सहज हैं।',
+    feature_4_title: 'प्रतिबद्ध होने से पहले देखें',
+    feature_4_desc: 'किसान आवेदन देख सकते हैं। श्रमिक नौकरियां देख सकते हैं। पूरी पारदर्शिता के साथ सूचित निर्णय लें।',
+    
+    // How it works
+    how_it_works: 'यह कैसे काम करता है',
+    for_farmers: 'किसानों के लिए',
+    for_workers: 'श्रमिकों के लिए',
+    farmer_step_1: 'अपनी प्रोफाइल बनाएं',
+    farmer_step_2: 'एक काम पोस्ट करें',
+    farmer_step_3: 'आवेदनों की समीक्षा करें',
+    farmer_step_4: 'काम पर रखें और प्रबंधित करें',
+    farmer_step_5: 'भुगतान प्रक्रिया करें',
+    
+    worker_step_1: 'अपनी प्रोफाइल बनाएं',
+    worker_step_2: 'पास के काम ब्राउज़ करें',
+    worker_step_3: 'काम के लिए आवेदन करें',
+    worker_step_4: 'काम पर लगाया जाएं',
+    worker_step_5: 'भुगतान प्राप्त करें',
+
+    ready_to_start: "शुरुआत करने के लिए तैयार हैं?",
+    signup_cta: "हजारों किसानों और श्रमिकों में शामिल हों जो बेहतर अवसर बना रहे हैं।",
   },
   kn: {
     // Shared
@@ -145,6 +223,8 @@ export const translations = {
     cancel: 'ರದ್ದುಮಾಡಿ',
     loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
     add_new: 'ಹೊಸ ಸೇರಿಸಿ',
+    samman_kendra: 'ಸಮ್ಮಾನ್ ಕೇಂದ್ರ',
+    sahyog_kendra: 'ಸಹಯೋಗ ಕೇಂದ್ರ',
 
     // Role Selection
     select_role: 'ಪ್ರಾರಂಭಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
@@ -198,5 +278,42 @@ export const translations = {
     yes: 'ಹೌದು',
     no: 'ಇಲ್ಲ',
     sign_out: 'ಲಾಗ್ ಔಟ್',
-  }
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'ಲಾಗಿನ್ ಮಾಡಿ',
+    home_title: 'ನ್ಯಾಯಸಮ್ಮತ ಕೆಲಸ, ನ್ಯಾಯಸಮ್ಮತ ವೇತನ',
+    home_subtitle: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರನ್ನು ನೇರವಾಗಿ ಸಂಪರ್ಕಿಸುವ ಮಾರುಕಟ್ಟೆ. ಕೆಲಸ ಪೋಸ್ಟ್ ಮಾಡಿ, ಕೆಲಸ ಹುಡುಕಿ, ನ್ಯಾಯಸಮ್ಮತವಾಗಿ ಗಳಿಸಿ.',
+    get_started: 'ಪ್ರಾರಂಭಿಸಿ',
+    learn_more: 'ಹೆಚ್ಚಿನ ಮಾಹಿತಿ',
+    
+    // Features
+    feature_1_title: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕ ಸಮುದಾಯ',
+    feature_1_desc: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರ ನಡುವಿನ ನೇರ ಸಂಪರ್ಕ. ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲದೆ ಸಂಬಂಧ ನಿರ್ಮಿಸಿ ಮತ್ತು ಒಟ್ಟಿಗೆ ಬೆಳೆದುಕೊಳ್ಳಿ.',
+    feature_2_title: 'ನ್ಯಾಯೋಚಿತ ವೇತನ, ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕತೆ',
+    feature_2_desc: 'ವೇತನವನ್ನು ಮುಂಚಿತವಾಗಿ ನೋಡಿ, ಯಾವುದೇ ಲುಕ್ಕಾ ಶುಲ್ಕ ಇಲ್ಲ. ಕಾರ್ಮಿಕರಿಗೆ ತಿಳಿದಿದೆ ಅವರು ಏನು ಅರ್ಜಿ ಮಾಡಿದ್ದಾರೆ. ರೈತರು ಸಾಧುವಾದ ದರಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡುತ್ತಾರೆ.',
+    feature_3_title: 'ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ',
+    feature_3_desc: 'ಇಂಗ್ಲಿಷ್, ಹಿಂದಿ ಮತ್ತು ಕನ್ನಡ ಬೆಂಬಲ. ನೀವು ಸುಖದಿಂದ ಭಾಷೆಯಲ್ಲಿ ಸಂಪರ್ಕ ಸಾಧಿಸಿ ಮತ್ತು ಸಂವಹನ ಮಾಡಿ.',
+    feature_4_title: 'ಪ್ರತಿಶ್ರುತಿ ಮುಂಚೆ ನೋಡಿ',
+    feature_4_desc: 'ರೈತರು ಅರ್ಜಿ ನೋಡಿಕೊಳ್ಳಬಹುದು. ಕಾರ್ಮಿಕರು ಕೆಲಸ ನೋಡಿಕೊಳ್ಳಬಹುದು. ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕತೆ ಹೊಂದಿ ತಿಳಿತ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳಿ.',
+    
+    // How it works
+    how_it_works: 'ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    for_farmers: 'ರೈತರಿಗೆ',
+    for_workers: 'ಕಾರ್ಮಿಕರಿಗೆ',
+    farmer_step_1: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ',
+    farmer_step_2: 'ಕೆಲಸ ಪೋಸ್ಟ್ ಮಾಡಿ',
+    farmer_step_3: 'ಅರ್ಜಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
+    farmer_step_4: 'ನೇಮಿಸಿ ಮತ್ತು ನಿರ್ವಹಿಸಿ',
+    farmer_step_5: 'ಭುಗತನ ಪ್ರಕ್ರಿಯೆ ಮಾಡಿ',
+    
+    worker_step_1: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ',
+    worker_step_2: 'ಹತ್ತಿರದ ಕೆಲಸಗಳನ್ನು ಬ್ರೌಸ್ ಮಾಡಿ',
+    worker_step_3: 'ಕೆಲಸಕ್ಕೆ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ',
+    worker_step_4: 'ನೇಮಿಸಲಾ',
+    worker_step_5: 'ಭುಗತನ ಪಡೆಯಿರಿ',
+
+    ready_to_start: "ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಾ?",
+    signup_cta: "ಸಾವಿರಾರು ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರಲ್ಲಿ ಸೇರಿ ಬೇಹುದು ಅವಕಾಶ ನಿರ್ಮಾಣ ಮಾಡುತ್ತಾರೆ.",
+  },
 }
