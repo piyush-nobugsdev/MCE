@@ -42,7 +42,6 @@ export default function WorkerSignupPage() {
   const handleSendOtp = async () => {
     if (!form.mobile.trim()) return toast.error('Enter your mobile number')
     setSendingOtp(true)
-    // MOCK: simulate OTP send
     await new Promise(r => setTimeout(r, 800))
     setSendingOtp(false)
     setOtpStatus('sent')
@@ -53,7 +52,6 @@ export default function WorkerSignupPage() {
     if (!form.otp.trim()) return toast.error('Enter the OTP')
     setOtpStatus('verifying')
     await new Promise(r => setTimeout(r, 600))
-    // MOCK: accept 123456
     if (form.otp !== '123456') {
       setOtpStatus('failed')
       setOtpPopup('fail')
@@ -115,274 +113,209 @@ export default function WorkerSignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-100 flex items-center justify-center p-4 py-10">
+    <div className="min-h-screen bg-white flex items-center justify-center p-6 py-10">
       <div className="w-full max-w-md">
 
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-200 mb-6 group hover:scale-105 transition-transform duration-300">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-blue-600 shadow-lg shadow-blue-100 mb-6">
             <HardHat className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">Create Worker Profile</h1>
-          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Start finding farm jobs near you</p>
+          <h1 className="text-3xl font-bold text-gray-900 leading-tight">Create Worker Profile</h1>
+          <p className="text-gray-500 mt-2 font-medium">Find the best farm jobs near you</p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-3xl shadow-xl shadow-blue-100 border border-blue-50 p-8 space-y-5">
+        {/* Form Area */}
+        <div className="space-y-6">
 
-          {/* Name row */}
+          {/* Name Row */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">First Name</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700">First Name</label>
               <input
-                id="worker-first-name"
                 type="text"
                 placeholder="Ramesh"
                 value={form.firstName}
                 onChange={e => set('firstName', e.target.value)}
                 required
-                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 placeholder:text-gray-300 transition"
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Last Name</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700">Last Name</label>
               <input
-                id="worker-last-name"
                 type="text"
                 placeholder="Singh"
                 value={form.lastName}
                 onChange={e => set('lastName', e.target.value)}
                 required
-                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 placeholder:text-gray-300 transition"
               />
             </div>
           </div>
 
-          {/* New Row: Age & Experience */}
+          {/* Age & Exp Row */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Age</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700">Your Age</label>
               <input
-                id="worker-age"
                 type="number"
                 placeholder="25"
                 value={form.age}
                 onChange={e => set('age', e.target.value)}
                 required
-                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
               />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Experience (Years)</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700">Years of Experience</label>
               <input
-                id="worker-experience"
                 type="number"
                 placeholder="5"
                 value={form.experience}
                 onChange={e => set('experience', e.target.value)}
                 required
-                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
               />
             </div>
           </div>
 
-          {/* Mobile */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Mobile Number <span className="text-red-500">*</span></label>
+          {/* Mobile Section */}
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-gray-700">Mobile Number</label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-300" />
                 <input
-                  id="worker-signup-mobile"
                   type="tel"
-                  placeholder="+91 99999 99999"
+                  placeholder="+91 00000 00000"
                   value={form.mobile}
                   onChange={e => {
                     const val = e.target.value
                     let newVal = val
-                    if (val.startsWith('+91 ')) {
-                      newVal = val
-                    } else if (val.startsWith('+91')) {
-                      newVal = '+91 ' + val.slice(3)
-                    } else {
-                      newVal = '+91 ' + val.replace(/^\+?91?\s*/, '')
-                    }
+                    if (val.startsWith('+91 ')) newVal = val
+                    else if (val.startsWith('+91')) newVal = '+91 ' + val.slice(3)
+                    else newVal = '+91 ' + val.replace(/^\+?91?\s*/, '')
                     set('mobile', newVal)
                   }}
                   disabled={otpStatus === 'verified'}
-                  className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent disabled:bg-gray-50 transition"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-100 rounded-xl text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 disabled:opacity-50 transition"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleSendOtp}
                 disabled={sendingOtp || otpStatus === 'verified' || otpStatus === 'sent'}
-                className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-semibold rounded-xl transition whitespace-nowrap"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-bold rounded-xl transition shadow-md shadow-blue-50 whitespace-nowrap"
               >
-                {sendingOtp ? <Loader2 className="w-4 h-4 animate-spin" /> : otpStatus === 'verified' ? '✓ Verified' : 'Get OTP'}
+                {sendingOtp ? <Loader2 className="w-5 h-5 animate-spin" /> : otpStatus === 'verified' ? '✓' : 'Get OTP'}
               </button>
             </div>
           </div>
 
-          {/* OTP Verify */}
+          {/* OTP Input */}
           {(otpStatus === 'sent' || otpStatus === 'verifying' || otpStatus === 'failed') && (
-            <div className="animate-in slide-in-from-top-2 duration-300">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Enter OTP</label>
+            <div className="space-y-2 animate-in slide-in-from-top-2 duration-300">
+              <label className="text-sm font-bold text-gray-700">Enter 6-digit OTP</label>
               <div className="flex gap-2">
                 <input
-                  id="worker-signup-otp"
                   type="text"
-                  inputMode="numeric"
                   maxLength={6}
-                  placeholder="6-digit OTP"
+                  placeholder="000000"
                   value={form.otp}
                   onChange={e => set('otp', e.target.value.replace(/\D/g, ''))}
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm tracking-widest font-mono focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+                  className="flex-1 px-4 py-3 border border-gray-100 rounded-xl text-2xl font-mono font-bold text-center tracking-widest focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
                 />
                 <button
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={otpStatus === 'verifying'}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white text-sm font-semibold rounded-xl transition"
+                  className="px-6 py-3 bg-black text-white text-sm font-bold rounded-xl transition hover:bg-gray-900"
                 >
-                  {otpStatus === 'verifying' ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Verify'}
+                  {otpStatus === 'verifying' ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Verify'}
                 </button>
               </div>
             </div>
           )}
 
-          {/* OTP Verified badge */}
           {otpStatus === 'verified' && (
-            <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2.5 rounded-xl text-sm font-medium">
-              <CheckCircle2 className="w-4 h-4" />
-              Mobile number verified!
+            <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-3 rounded-xl text-sm font-bold border border-blue-100 animate-in fade-in duration-500">
+              <CheckCircle2 className="w-4 h-4" /> Phone verified!
             </div>
           )}
 
-          {/* Village */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Village / Town</label>
-            <input
-              id="worker-village"
-              type="text"
-              placeholder="Your village or town"
-              value={form.village}
-              onChange={e => set('village', e.target.value)}
-              required
-              className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-
-          {/* District + State */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">District</label>
+          {/* Location Area */}
+          <div className="space-y-4 pt-4 border-t border-gray-50">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700 text-center block">Home Address</label>
               <input
-                id="worker-district"
+                type="text"
+                placeholder="Village Name"
+                value={form.village}
+                onChange={e => set('village', e.target.value)}
+                required
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl text-lg font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <input
                 type="text"
                 placeholder="District"
                 value={form.district}
                 onChange={e => set('district', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">State</label>
               <input
-                id="worker-state"
                 type="text"
                 placeholder="State"
                 value={form.state}
                 onChange={e => set('state', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-              />
-            </div>
-          </div>
-
-          {/* Lat / Lng */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Home Location</label>
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              <input
-                id="worker-lat"
-                type="number"
-                step="0.000001"
-                placeholder="Latitude"
-                value={form.latitude}
-                onChange={e => set('latitude', e.target.value)}
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition font-mono"
-              />
-              <input
-                id="worker-lng"
-                type="number"
-                step="0.000001"
-                placeholder="Longitude"
-                value={form.longitude}
-                onChange={e => set('longitude', e.target.value)}
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition font-mono"
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition"
               />
             </div>
             <button
               type="button"
               onClick={handleGetLocation}
-              className="w-full py-2.5 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium rounded-xl text-sm transition flex items-center justify-center gap-2"
+              className="w-full py-3 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 font-bold rounded-xl text-sm transition flex items-center justify-center gap-2"
             >
-              <MapPin className="w-4 h-4" /> Get My Location
+              <MapPin className="w-4 h-4" /> Auto-detect Location
             </button>
           </div>
 
-          {/* Skills */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Skills <span className="text-gray-400 font-normal">(comma separated)</span></label>
-            <textarea
-              id="worker-skills"
-              placeholder="e.g., Sowing, Harvesting, Irrigation"
-              value={form.skills}
-              onChange={e => set('skills', e.target.value)}
-              rows={2}
-              className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition resize-none"
-            />
+          {/* Skills Area */}
+          <div className="pt-4 border-t border-gray-50 space-y-2">
+             <label className="text-sm font-bold text-gray-700">Your Skills (e.g., Sowing, Harvesting)</label>
+             <textarea
+                placeholder="What work can you do?"
+                value={form.skills}
+                onChange={e => set('skills', e.target.value)}
+                rows={2}
+                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-blue-50 transition resize-none"
+             />
           </div>
 
-          {/* Travel Distance */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Max Travel Distance (km)</label>
-            <input
-              id="worker-travel"
-              type="number"
-              placeholder="10"
-              value={form.travel_distance}
-              onChange={e => set('travel_distance', e.target.value)}
-              className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
-            />
-          </div>
-
-          {/* Create Profile */}
-          <form onSubmit={handleSubmit}>
+          {/* Submit */}
+          <form onSubmit={handleSubmit} className="pt-6">
             <button
-              id="worker-create-profile-btn"
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-base"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold rounded-2xl transition shadow-lg shadow-blue-100 text-lg"
             >
-              {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Creating Profile...</> : 'Create Worker Profile'}
+              {loading ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : 'Finish & Find Work'}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3">
-            <div className="flex-1 h-px bg-gray-100" />
-            <span className="text-xs text-gray-400">or</span>
-            <div className="flex-1 h-px bg-gray-100" />
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-50"></div></div>
+            <div className="relative flex justify-center text-[10px] font-bold uppercase"><span className="bg-white px-3 text-gray-300">Or use google</span></div>
           </div>
 
-          {/* Google */}
           <button
             type="button"
             onClick={handleGoogle}
-            className="w-full py-3 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 font-semibold rounded-xl transition flex items-center justify-center gap-3 shadow-sm"
+            className="w-full py-3.5 bg-white hover:bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-600 transition flex items-center justify-center gap-3 shadow-sm"
           >
             <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -390,24 +323,23 @@ export default function WorkerSignupPage() {
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
-            Continue with Google
+            Google
           </button>
 
           <p className="text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <Link href="/auth/worker/login" className="text-blue-600 hover:text-blue-700 font-semibold">
-              Back to Login
+            <Link href="/auth/worker/login" className="text-blue-600 font-bold hover:underline">
+              Login
             </Link>
           </p>
         </div>
 
-        {/* OTP Popup Overlay */}
+        {/* Popups */}
         {otpPopup && (
-          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl text-white font-semibold text-base animate-in zoom-in-95 duration-200 ${otpPopup === 'success' ? 'bg-blue-600' : 'bg-red-500'}`}>
-              {otpPopup === 'success'
-                ? <><CheckCircle2 className="w-5 h-5" /> Mobile Verified Successfully!</>
-                : <><XCircle className="w-5 h-5" /> Verification Failed. Try again.</>}
+          <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+            <div className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-xl text-white font-bold text-sm animate-in slide-in-from-bottom-5 duration-300 ${otpPopup === 'success' ? 'bg-blue-600' : 'bg-red-500'}`}>
+              {otpPopup === 'success' ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+              {otpPopup === 'success' ? 'Mobile Verified!' : 'Wrong OTP. Try again.'}
             </div>
           </div>
         )}

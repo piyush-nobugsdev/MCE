@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 
 export async function recordAttendance(data: {
   job_id: string
@@ -21,7 +21,7 @@ export async function recordAttendance(data: {
     return { error: error.message }
   }
 
-  revalidateTag('attendance')
+  revalidatePath('/farmer/dashboard')
   return { attendance }
 }
 
@@ -37,7 +37,7 @@ export async function confirmAttendance(attendanceId: string) {
     return { error: error.message }
   }
 
-  revalidateTag('attendance')
+  revalidatePath('/farmer/dashboard')
   return { success: true }
 }
 
