@@ -11,7 +11,7 @@ interface PaymentDetails {
   id: string
   amount: number
   status: string
-  worker_name: string
+  worker_first_name: string
   job_title: string
   paid_date: string | null
   created_at: string
@@ -59,16 +59,16 @@ export default function FarmerPaymentsPage() {
                 .map(async (p) => {
                   const jobTitle =
                     farmerJobs.find((j) => j.id === p.job_id)?.title || 'Unknown Job'
-                  const { data: workerData } = await supabase
+                   const { data: workerData } = await supabase
                     .from('workers')
-                    .select('name')
+                    .select('first_name')
                     .eq('id', p.worker_id)
                     .single()
 
                   return {
                     ...p,
                     job_title: jobTitle,
-                    worker_name: workerData?.name || 'Unknown Worker',
+                    worker_first_name: workerData?.first_name || 'Worker',
                   }
                 })
             )
@@ -101,18 +101,36 @@ export default function FarmerPaymentsPage() {
       <FarmerNavbar />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Payments</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Payment History</h1>
+          <p className="text-gray-500 mt-1">Record of completed and pending payments for workers.</p>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 mb-8 flex items-start gap-4">
+          <div className="bg-emerald-100 p-2 rounded-lg">
+            <DollarSign className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <h4 className="font-semibold text-emerald-900">Direct Payment Policy</h4>
+            <p className="text-sm text-emerald-700">
+              This app is completely free. Payments are handled directly (Cash/UPI) between the farmer and worker on the field. This page serves as your personal digital ledger.
+            </p>
+          </div>
+        </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="border-0 shadow-lg shadow-yellow-100/50 rounded-3xl overflow-hidden">
+            <CardContent className="pt-8 pb-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm">Total Pending</p>
-                  <p className="text-2xl font-bold text-yellow-600">${totalPending.toFixed(2)}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Pending</p>
+                  <p className="text-3xl font-black text-yellow-600">₹{totalPending.toFixed(0)}</p>
                 </div>
-                <DollarSign className="w-8 h-8 text-yellow-500 opacity-50" />
+                <div className="bg-yellow-50 p-3 rounded-2xl">
+                  <DollarSign className="w-6 h-6 text-yellow-500" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -187,11 +205,11 @@ export default function FarmerPaymentsPage() {
                   </thead>
                   <tbody className="divide-y">
                     {payments.map((payment) => (
-                      <tr key={payment.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm">{payment.worker_name}</td>
-                        <td className="px-6 py-4 text-sm">{payment.job_title}</td>
-                        <td className="px-6 py-4 text-sm font-semibold">
-                          ${payment.amount.toFixed(2)}
+                      <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-5 text-lg font-bold text-gray-900 uppercase tracking-tight">{payment.worker_first_name}</td>
+                        <td className="px-6 py-5 text-gray-500 font-medium uppercase text-xs tracking-wider">{payment.job_title}</td>
+                        <td className="px-6 py-5 text-lg font-black text-green-600">
+                          ₹{payment.amount.toFixed(0)}
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <span

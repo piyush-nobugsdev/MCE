@@ -30,7 +30,13 @@ CREATE TABLE IF NOT EXISTS workers (
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   first_name VARCHAR(120) NOT NULL,
   last_name  VARCHAR(120) NOT NULL,
-  full_name  VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
+  full_name  VARCHAR(255) GENERATED ALWAYS AS (
+    CASE WHEN last_name = '' THEN first_name
+         ELSE first_name || ' ' || last_name
+    END
+  ) STORED,
+  age INTEGER,
+  experience INTEGER, -- in years
   village VARCHAR(255) NOT NULL,
   district VARCHAR(255) NOT NULL,
   state VARCHAR(255) NOT NULL,

@@ -14,7 +14,9 @@ interface ApplicationWithDetails {
   job_id: string
   worker_id: string
   job_title: string
-  worker_name: string
+  worker_first_name: string
+  worker_age: number | null
+  worker_experience: number | null
 }
 
 export default function FarmerApplicationsPage() {
@@ -29,7 +31,7 @@ export default function FarmerApplicationsPage() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        window.location.href = '/auth/phone'
+        window.location.href = '/auth/role-selection'
         return
       }
 
@@ -64,14 +66,16 @@ export default function FarmerApplicationsPage() {
                     farmerJobs.find((j) => j.id === app.job_id)?.title || 'Unknown Job'
                   const { data: workerData } = await supabase
                     .from('workers')
-                    .select('name')
+                    .select('first_name, age, experience')
                     .eq('id', app.worker_id)
                     .single()
 
                   return {
                     ...app,
                     job_title: jobTitle,
-                    worker_name: workerData?.name || 'Unknown Worker',
+                    worker_first_name: workerData?.first_name || 'Worker',
+                    worker_age: workerData?.age,
+                    worker_experience: workerData?.experience,
                   }
                 })
             )
@@ -99,8 +103,11 @@ export default function FarmerApplicationsPage() {
     <div className="min-h-screen bg-gray-50">
       <FarmerNavbar />
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Job Applications</h1>
+      <main className="max-w-5xl mx-auto px-4 py-12">
+        <div className="mb-10">
+          <h1 className="text-4xl font-black text-gray-900 uppercase tracking-tight">Worker Applications</h1>
+          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Review and hire workers for your farm</p>
+        </div>
 
         {applications.length === 0 ? (
           <Card>
@@ -112,34 +119,46 @@ export default function FarmerApplicationsPage() {
         ) : (
           <div className="space-y-4">
             {applications.map((app) => (
-              <Card key={app.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <Card key={app.id} className="hover:shadow-2xl transition-all duration-300 border-0 shadow-lg shadow-gray-200/50 rounded-3xl overflow-hidden group">
+                <CardContent className="pt-8 pb-8 px-8">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold">{app.worker_name}</h3>
-                      <p className="text-gray-600 text-sm">Applied for: {app.job_title}</p>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">{app.worker_first_name}</h3>
+                        <div className="flex gap-2">
+                          {app.worker_age && (
+                            <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold rounded-lg uppercase tracking-wider">{app.worker_age} Years Old</span>
+                          )}
+                          {app.worker_experience !== null && (
+                            <span className="px-3 py-1 bg-green-50 text-green-700 text-xs font-bold rounded-lg uppercase tracking-wider">{app.worker_experience}Y EXP</span>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-gray-500 font-medium uppercase text-sm tracking-widest mb-4">Applied for: <span className="text-gray-900">{app.job_title}</span></p>
                       {app.message && (
-                        <p className="text-gray-700 mt-2 italic">{`"${app.message}"`}</p>
+                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                          <p className="text-gray-700 italic">"{app.message}"</p>
+                        </div>
                       )}
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col sm:flex-row gap-3 mt-4 md:mt-0">
                       <span
-                        className={`px-3 py-1 rounded-full text-sm font-medium text-center ${
+                        className={`px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-center ${
                           app.status === 'pending'
-                            ? 'bg-yellow-100 text-yellow-700'
+                            ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-100'
                             : app.status === 'accepted'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-green-50 text-green-700 border-2 border-green-100'
+                              : 'bg-red-50 text-red-700 border-2 border-red-100'
                         }`}
                       >
                         {app.status}
                       </span>
                       {app.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        <div className="flex gap-3">
+                          <Button className="bg-green-600 hover:bg-green-700 h-14 px-8 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-green-100">
                             Accept
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button variant="outline" className="h-14 px-8 rounded-2xl text-xs font-black uppercase tracking-widest border-2 border-gray-100 hover:bg-gray-50">
                             Reject
                           </Button>
                         </div>

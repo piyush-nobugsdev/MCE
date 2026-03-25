@@ -106,6 +106,9 @@ export async function signUpAsRole(
           ?.split(',')
           .map((s) => s.trim())
           .filter(Boolean) ?? [],
+      age: data.age ? parseInt(data.age) : null,
+      experience: data.experience ? parseInt(data.experience) : null,
+      skills: data.skills?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
       travel_distance_preference: parseInt(data.travel_distance ?? '10'),
     })
     console.log('3. worker insert error:', error?.message)

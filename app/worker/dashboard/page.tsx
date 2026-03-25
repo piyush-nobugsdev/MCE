@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { Plus, Briefcase, CheckCircle, DollarSign } from 'lucide-react'
+import { Plus, Briefcase, CheckCircle, DollarSign, Star } from 'lucide-react'
 import { Worker, Job } from '@/lib/types'
 
 interface JobWithApplicationStatus extends Job {
@@ -26,7 +26,7 @@ export default function WorkerDashboard() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        window.location.href = '/auth/phone'
+        window.location.href = '/auth/role-selection'
         return
       }
 
@@ -94,60 +94,58 @@ export default function WorkerDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {worker.full_name}!
+        <div className="mb-10">
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">
+            Hello, {worker.first_name}!
           </h1>
-          <p className="text-gray-600">Find and apply for farm jobs in your area</p>
+          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Find your next job in seconds</p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Jobs Applied</CardTitle>
-              <Briefcase className="h-4 w-4 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-0 shadow-xl shadow-blue-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Jobs Applied</CardTitle>
+              <Briefcase className="h-5 w-5 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">-</div>
-              <p className="text-xs text-gray-500">View in applications</p>
+              <div className="text-3xl font-black text-gray-900">-</div>
+              <p className="text-xs font-bold text-blue-600 uppercase mt-1">Pending approval</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Jobs Completed</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-600" />
+          <Card className="border-0 shadow-xl shadow-green-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Completed</CardTitle>
+              <CheckCircle className="h-5 w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{worker.total_jobs_completed}</div>
-              <p className="text-xs text-gray-500">Finished jobs</p>
+              <div className="text-3xl font-black text-gray-900">{worker.total_jobs_completed}</div>
+              <p className="text-xs font-bold text-green-600 uppercase mt-1">Total finished</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rating</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-600" />
+          <Card className="border-0 shadow-xl shadow-yellow-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Worker Rating</CardTitle>
+              <Star className="h-5 w-5 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{worker.rating.toFixed(1)}</div>
-              <p className="text-xs text-gray-500">Average rating</p>
+              <div className="text-3xl font-black text-gray-900">{worker.rating.toFixed(1)}</div>
+              <p className="text-xs font-bold text-yellow-600 uppercase mt-1">Avg Score</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Link href="/worker/jobs">
-            <Button className="w-full bg-blue-600 hover:bg-blue-700 h-12">
-              <Plus className="w-5 h-5 mr-2" />
-              Browse All Jobs
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 h-16 rounded-2xl text-lg font-black uppercase tracking-wide shadow-xl shadow-blue-200">
+              <Plus className="w-6 h-6 mr-2 stroke-[3]" />
+              Find New Jobs
             </Button>
           </Link>
           <Link href="/worker/applications">
-            <Button variant="outline" className="w-full h-12">
-              View My Applications
+            <Button variant="outline" className="w-full h-16 rounded-2xl text-lg font-black uppercase tracking-wide border-2 border-gray-100 hover:bg-gray-50">
+              My Applications
             </Button>
           </Link>
         </div>
@@ -177,7 +175,7 @@ export default function WorkerDashboard() {
                           {typeof job.location === 'string' ? job.location : job.location?.name || 'Unknown location'}
                         </p>
                         <p className="text-sm text-blue-600 font-medium mt-1">
-                          ${job.wage_amount}/day
+                          ₹{job.wage_amount}/day
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
