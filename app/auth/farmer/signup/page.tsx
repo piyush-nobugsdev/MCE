@@ -112,33 +112,33 @@ export default function FarmerSignupPage() {
       <div className="w-full max-w-md">
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-600 shadow-lg mb-4">
-            <Sprout className="w-8 h-8 text-white" />
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-green-600 shadow-2xl shadow-green-200 mb-6 group hover:scale-105 transition-transform duration-300">
+            <Sprout className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Create Farmer Profile</h1>
-          <p className="text-gray-500 mt-1">Join the farm work marketplace</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">Create Farmer Profile</h1>
+          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Start finding workers for your farm</p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-xl shadow-emerald-100 border border-emerald-50 p-8 space-y-5">
 
           {/* Name row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">First Name</label>
               <input
                 id="farmer-first-name"
                 type="text"
-                placeholder="Ravi"
+                placeholder="Rajesh"
                 value={form.firstName}
                 onChange={e => set('firstName', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-400 transition placeholder:text-gray-300"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Last Name</label>
               <input
                 id="farmer-last-name"
                 type="text"
@@ -146,7 +146,7 @@ export default function FarmerSignupPage() {
                 value={form.lastName}
                 onChange={e => set('lastName', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition"
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-400 transition placeholder:text-gray-300"
               />
             </div>
           </div>

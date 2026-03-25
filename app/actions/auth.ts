@@ -100,6 +100,8 @@ export async function signUpAsRole(
         lat: parseFloat(data.latitude),
         lng: parseFloat(data.longitude),
       },
+      age: data.age ? parseInt(data.age) : null,
+      experience: data.experience ? parseInt(data.experience) : null,
       skills: data.skills?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
       travel_distance_preference: parseInt(data.travel_distance ?? '10'),
     })
