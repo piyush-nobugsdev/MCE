@@ -21,7 +21,7 @@ export default function WorkerJobsPage() {
       const { data } = await supabase
         .from('jobs')
         .select('*')
-        .eq('status', 'posted')
+        .eq('status', 'open')
         .order('created_at', { ascending: false })
       if (data) setJobs(data)
       setLoading(false)
