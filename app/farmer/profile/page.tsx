@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { FarmerNavbar } from '../components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { User, MapPin, Phone, LogOut, Briefcase } from 'lucide-react'
+import { User, MapPin, LogOut, CheckCircle2, Star, Sprout, Briefcase } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
-import { toast } from 'sonner'
 
 export default function FarmerProfilePage() {
   const [profile, setProfile] = useState<any>(null)
@@ -31,84 +30,93 @@ export default function FarmerProfilePage() {
 
   const handleSignOut = async () => {
     await signOut()
-    toast.success('Signed out')
+    window.location.href = '/auth/role-selection'
   }
 
-  if (loading) return <div className="p-10 text-center">Loading profile...</div>
-  if (!profile) return <div className="p-10 text-center text-red-500">Profile not found. Please log in again.</div>
+  if (loading) return <div className="p-10 text-center font-black uppercase tracking-widest text-gray-400">Loading Profile...</div>
+  
+  if (!profile) return (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <p className="text-xl font-black text-gray-900 uppercase tracking-tight mb-4">Profile Not Found</p>
+      <button onClick={() => window.location.href = '/auth/role-selection'} className="px-8 py-4 bg-green-600 text-white font-black uppercase rounded-2xl">Go to Login</button>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-emerald-50/30">
+    <div className="min-h-screen bg-green-50/30 font-sans">
       <FarmerNavbar />
       
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
-          
-          {/* Avatar side */}
-          <div className="w-full md:w-1/3 text-center">
-            <div className="relative inline-block">
-              <div className="w-32 h-32 rounded-3xl bg-emerald-600 flex items-center justify-center text-white shadow-2xl shadow-emerald-200 mb-4">
-                <User className="w-16 h-16" />
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">{profile.first_name} {profile.last_name}</h2>
-            <p className="text-emerald-600 font-semibold mb-6 italic opacity-75">Verified Farmer</p>
-            
-            <button 
-              onClick={handleSignOut}
-              className="w-full py-3 bg-white hover:bg-red-50 text-red-600 border border-red-100 rounded-2xl transition font-semibold flex items-center justify-center gap-2"
-            >
-              <LogOut className="w-4 h-4" /> Sign Out
-            </button>
-          </div>
+      <main className="max-w-5xl mx-auto px-4 py-12">
+        <div className="mb-12 text-center md:text-left">
+          <h1 className="text-5xl font-black text-gray-900 uppercase tracking-tight">Farmer Profile</h1>
+          <p className="text-xl text-gray-400 mt-2 font-medium uppercase tracking-widest leading-loose">Manage your agricultural workforce</p>
+        </div>
 
-          {/* Details side */}
-          <div className="flex-1 space-y-6">
-            <Card className="rounded-3xl border-0 shadow-xl shadow-emerald-100/50">
-              <CardHeader className="border-b border-emerald-50 pb-4">
-                <CardTitle className="text-lg flex items-center gap-2 text-emerald-900">
-                  <User className="w-5 h-5 text-emerald-600" /> Basic Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">First Name</p>
-                    <p className="text-gray-900 font-medium">{profile.first_name}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Last Name</p>
-                    <p className="text-gray-900 font-medium">{profile.last_name}</p>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <Card className="border-0 shadow-2xl shadow-green-100 rounded-[3rem] overflow-hidden bg-white">
+              <CardContent className="pt-12 pb-10 px-8 text-center">
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-[2.5rem] bg-green-600 shadow-2xl shadow-green-200 mb-8">
+                  <Sprout className="w-16 h-16 text-white" />
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Village / Town</p>
-                  <p className="text-gray-900 font-medium">{profile.village}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">District</p>
-                    <p className="text-gray-900 font-medium">{profile.district}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">State</p>
-                    <p className="text-gray-900 font-medium">{profile.state}</p>
+                <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight mb-2">{profile.first_name}</h2>
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">{profile.district}, {profile.state}</p>
+                
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-center gap-2">
+                    <span className="px-5 py-2.5 bg-green-50 text-green-700 text-xs font-black rounded-xl uppercase tracking-widest">Farmer</span>
+                    <span className="px-5 py-2.5 bg-yellow-50 text-yellow-700 text-xs font-black rounded-xl uppercase tracking-widest">★ {profile.rating?.toFixed(1) || '0.0'}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-emerald-100/50 border border-emerald-50">
-                <Briefcase className="w-6 h-6 text-emerald-600 mb-3" />
-                <p className="text-2xl font-bold text-gray-900">{profile.total_jobs_posted || 0}</p>
-                <p className="text-xs font-semibold text-gray-400 uppercase">Jobs Posted</p>
+            <button 
+              onClick={handleSignOut}
+              className="w-full py-6 bg-red-50 hover:bg-red-100 text-red-600 rounded-[2rem] transition-all font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-red-100"
+            >
+              <LogOut className="w-6 h-6 stroke-[3]" /> Sign Out
+            </button>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="border-0 shadow-2xl shadow-green-100 rounded-[3rem] overflow-hidden bg-white">
+              <CardHeader className="bg-green-50/50 px-10 py-8 border-b border-green-100">
+                <CardTitle className="text-xl font-black text-green-900 uppercase tracking-widest flex items-center gap-3">
+                  <Briefcase className="w-6 h-6 text-green-600" /> Farm Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Village / Town</p>
+                    <p className="text-xl font-bold text-gray-900 uppercase">{profile.village}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">District</p>
+                    <p className="text-xl font-bold text-gray-900 uppercase">{profile.district}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">State</p>
+                    <p className="text-xl font-bold text-gray-900 uppercase">{profile.state}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-green-50 border-2 border-green-50 flex flex-col items-center text-center group hover:bg-green-600 transition-colors duration-500">
+                <CheckCircle2 className="w-10 h-10 text-green-600 mb-4 group-hover:text-white transition-colors" />
+                <p className="text-4xl font-black text-gray-900 mb-1 group-hover:text-white transition-colors">0</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-green-100 transition-colors">Jobs Posted</p>
               </div>
-              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-emerald-100/50 border border-emerald-50">
-                <MapPin className="w-6 h-6 text-emerald-600 mb-3" />
-                <p className="text-sm font-bold text-gray-900">Captured</p>
-                <p className="text-xs font-semibold text-gray-400 uppercase">Farm Location</p>
+              <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-green-50 border-2 border-green-50 flex flex-col items-center text-center group hover:bg-green-600 transition-colors duration-500">
+                <Star className="w-10 h-10 text-yellow-500 mb-4 group-hover:text-white transition-colors" />
+                <p className="text-4xl font-black text-gray-900 mb-1 group-hover:text-white transition-colors">{profile.rating?.toFixed(1) || '0.0'}</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-green-100 transition-colors">Farm Rating</p>
               </div>
             </div>
           </div>

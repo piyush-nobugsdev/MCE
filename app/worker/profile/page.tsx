@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { WorkerNavbar } from '../components/navbar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { User, MapPin, Wrench, LogOut, CheckCircle2, Star } from 'lucide-react'
+import { User, MapPin, LogOut, CheckCircle2, Star, Briefcase } from 'lucide-react'
 import { signOut } from '@/app/actions/auth'
 import { toast } from 'sonner'
 
@@ -31,106 +31,104 @@ export default function WorkerProfilePage() {
 
   const handleSignOut = async () => {
     await signOut()
-    toast.success('Signed out')
+    window.location.href = '/auth/role-selection'
   }
 
-  if (loading) return <div className="p-10 text-center">Loading profile...</div>
-  if (!profile) return <div className="p-10 text-center text-red-500">Profile not found. Please log in again.</div>
+  if (loading) return <div className="p-10 text-center font-black uppercase tracking-widest text-gray-400">Loading Profile...</div>
+  
+  if (!profile) return (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+      <p className="text-xl font-black text-gray-900 uppercase tracking-tight mb-4">Profile Not Found</p>
+      <button onClick={() => window.location.href = '/auth/role-selection'} className="px-8 py-4 bg-blue-600 text-white font-black uppercase rounded-2xl">Go to Login</button>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-blue-50/30">
+    <div className="min-h-screen bg-blue-50/30 font-sans">
       <WorkerNavbar />
       
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <div className="flex flex-col md:flex-row gap-8 items-start">
+      <main className="max-w-5xl mx-auto px-4 py-12">
+        <div className="mb-12 text-center md:text-left">
+          <h1 className="text-5xl font-black text-gray-900 uppercase tracking-tight">Worker Profile</h1>
+          <p className="text-xl text-gray-400 mt-2 font-medium uppercase tracking-widest leading-loose">Manage your professional identity</p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
-          {/* Avatar side */}
-          <div className="w-full md:w-1/3 text-center">
-            <div className="relative inline-block">
-              <div className="w-32 h-32 rounded-3xl bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-200 mb-4">
-                <User className="w-16 h-16" />
-              </div>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900">{profile.first_name} {profile.last_name}</h2>
-            <p className="text-blue-600 font-semibold mb-6 italic opacity-75">Registered Worker</p>
-            
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <Card className="border-0 shadow-2xl shadow-blue-100 rounded-[3rem] overflow-hidden bg-white">
+              <CardContent className="pt-12 pb-10 px-8 text-center">
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-[2.5rem] bg-blue-600 shadow-2xl shadow-blue-200 mb-8">
+                  <User className="w-16 h-16 text-white" />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900 uppercase tracking-tight mb-2">{profile.first_name}</h2>
+                <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-8">{profile.district}, {profile.state}</p>
+                
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-center gap-2">
+                    <span className="px-5 py-2.5 bg-blue-50 text-blue-700 text-xs font-black rounded-xl uppercase tracking-widest">Worker</span>
+                    <span className="px-5 py-2.5 bg-yellow-50 text-yellow-700 text-xs font-black rounded-xl uppercase tracking-widest">★ {profile.rating?.toFixed(1) || '0.0'}</span>
+                  </div>
+                  <div className="flex justify-center gap-2">
+                    {profile.age && <span className="px-5 py-2.5 bg-gray-50 text-gray-700 text-xs font-black rounded-xl uppercase tracking-widest">{profile.age} Years</span>}
+                    {profile.experience !== null && <span className="px-5 py-2.5 bg-gray-50 text-gray-700 text-xs font-black rounded-xl uppercase tracking-widest">{profile.experience}Y Exp</span>}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <button 
               onClick={handleSignOut}
-              className="w-full py-3 bg-white hover:bg-red-50 text-red-600 border border-red-100 rounded-2xl transition font-semibold flex items-center justify-center gap-2"
+              className="w-full py-6 bg-red-50 hover:bg-red-100 text-red-600 rounded-[2rem] transition-all font-black uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-red-100"
             >
-              <LogOut className="w-4 h-4" /> Sign Out
+              <LogOut className="w-6 h-6 stroke-[3]" /> Sign Out
             </button>
           </div>
 
-          {/* Details side */}
-          <div className="flex-1 space-y-6">
-            <Card className="rounded-3xl border-0 shadow-xl shadow-blue-100/50">
-              <CardHeader className="border-b border-blue-50 pb-4">
-                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
-                  <User className="w-5 h-5 text-blue-600" /> Basic Information
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            <Card className="border-0 shadow-2xl shadow-blue-100 rounded-[3rem] overflow-hidden bg-white">
+              <CardHeader className="bg-blue-50/50 px-10 py-8 border-b border-blue-100">
+                <CardTitle className="text-xl font-black text-blue-900 uppercase tracking-widest flex items-center gap-3">
+                  <Briefcase className="w-6 h-6 text-blue-600" /> Professional Bio
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">First Name</p>
-                    <p className="text-gray-900 font-medium">{profile.first_name}</p>
+              <CardContent className="p-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Village / Town</p>
+                    <p className="text-xl font-bold text-gray-900 uppercase">{profile.village}</p>
                   </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Last Name</p>
-                    <p className="text-gray-900 font-medium">{profile.last_name}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Village / Town</p>
-                  <p className="text-gray-900 font-medium">{profile.village}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">District</p>
-                    <p className="text-gray-900 font-medium">{profile.district}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">State</p>
-                    <p className="text-gray-900 font-medium">{profile.state}</p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Travel Preference</p>
+                    <p className="text-xl font-bold text-gray-900 uppercase">{profile.travel_distance_preference || 10} KM</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Skills */}
-            <Card className="rounded-3xl border-0 shadow-xl shadow-blue-100/50">
-              <CardHeader className="border-b border-blue-50 pb-4">
-                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
-                  <Star className="w-5 h-5 text-blue-600" /> Professional Skills
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills && profile.skills.length > 0 ? (
-                    profile.skills.map((skill: string) => (
-                      <span key={skill} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+                <div className="space-y-4">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Skills & Expertise</p>
+                  <div className="flex flex-wrap gap-3">
+                    {profile.skills?.length > 0 ? profile.skills.map((skill: string) => (
+                      <span key={skill} className="px-6 py-3 bg-blue-50 text-blue-700 font-black text-xs uppercase tracking-widest rounded-2xl border-2 border-blue-100/50">
                         {skill}
                       </span>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-400 italic">No skills added yet.</p>
-                  )}
+                    )) : <p className="text-gray-400 italic font-medium">No skills listed</p>}
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-blue-100/50 border border-blue-50">
-                <CheckCircle2 className="w-6 h-6 text-blue-600 mb-3" />
-                <p className="text-2xl font-bold text-gray-900">{profile.total_jobs_completed || 0}</p>
-                <p className="text-xs font-semibold text-gray-400 uppercase">Jobs Completed</p>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-50 border-2 border-blue-50 flex flex-col items-center text-center group hover:bg-blue-600 transition-colors duration-500">
+                <CheckCircle2 className="w-10 h-10 text-blue-600 mb-4 group-hover:text-white transition-colors" />
+                <p className="text-4xl font-black text-gray-900 mb-1 group-hover:text-white transition-colors">{profile.total_jobs_completed || 0}</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-blue-100 transition-colors">Jobs Completed</p>
               </div>
-              <div className="bg-white p-6 rounded-3xl shadow-xl shadow-blue-100/50 border border-blue-50">
-                <MapPin className="w-6 h-6 text-blue-600 mb-3" />
-                <p className="text-lg font-bold text-gray-900">{profile.travel_distance_preference || 0} km</p>
-                <p className="text-xs font-semibold text-gray-400 uppercase">Preferred Range</p>
+              <div className="bg-white p-10 rounded-[2.5rem] shadow-2xl shadow-blue-50 border-2 border-blue-50 flex flex-col items-center text-center group hover:bg-blue-600 transition-colors duration-500">
+                <Star className="w-10 h-10 text-yellow-500 mb-4 group-hover:text-white transition-colors" />
+                <p className="text-4xl font-black text-gray-900 mb-1 group-hover:text-white transition-colors">{profile.rating?.toFixed(1) || '0.0'}</p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] group-hover:text-blue-100 transition-colors">Worker Rating</p>
               </div>
             </div>
           </div>

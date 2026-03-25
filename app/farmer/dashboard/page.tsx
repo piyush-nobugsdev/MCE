@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { FarmerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { Plus, Briefcase, Users, DollarSign } from 'lucide-react'
+import { Plus, Briefcase, Users, DollarSign, Star } from 'lucide-react'
 import { Farmer, Job } from '@/lib/types'
 
 export default function FarmerDashboard() {
@@ -79,60 +79,58 @@ export default function FarmerDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {farmer.full_name}!
+        <div className="mb-10">
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">
+            Hello, {farmer.first_name}!
           </h1>
-          <p className="text-gray-600">Manage your farm jobs and workers</p>
+          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Manage your farm crops & workforce</p>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Jobs</CardTitle>
-              <Briefcase className="h-4 w-4 text-green-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-0 shadow-xl shadow-green-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Active Jobs</CardTitle>
+              <Briefcase className="h-5 w-5 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{activeJobs}</div>
-              <p className="text-xs text-gray-500">Jobs currently posted</p>
+              <div className="text-3xl font-black text-gray-900">{activeJobs}</div>
+              <p className="text-xs font-bold text-green-600 uppercase mt-1">Live Postings</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completed</CardTitle>
-              <Users className="h-4 w-4 text-blue-600" />
+          <Card className="border-0 shadow-xl shadow-blue-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Completed</CardTitle>
+              <Users className="h-5 w-5 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{completedJobs}</div>
-              <p className="text-xs text-gray-500">Finished jobs</p>
+              <div className="text-3xl font-black text-gray-900">{completedJobs}</div>
+              <p className="text-xs font-bold text-blue-600 uppercase mt-1">Finished tasks</p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rating</CardTitle>
-              <DollarSign className="h-4 w-4 text-yellow-600" />
+          <Card className="border-0 shadow-xl shadow-yellow-100/50 rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-xs font-bold text-gray-400 uppercase tracking-widest">Farm Rating</CardTitle>
+              <Star className="h-5 w-5 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{farmer.rating.toFixed(1)}</div>
-              <p className="text-xs text-gray-500">Average rating</p>
+              <div className="text-3xl font-black text-gray-900">{farmer.rating.toFixed(1)}</div>
+              <p className="text-xs font-bold text-yellow-600 uppercase mt-1">Reviews</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <Link href="/farmer/jobs/new">
-            <Button className="w-full bg-green-600 hover:bg-green-700 h-12">
-              <Plus className="w-5 h-5 mr-2" />
+            <Button className="w-full bg-green-600 hover:bg-green-700 h-16 rounded-2xl text-lg font-black uppercase tracking-wide shadow-xl shadow-green-200">
+              <Plus className="w-6 h-6 mr-2 stroke-[3]" />
               Post New Job
             </Button>
           </Link>
           <Link href="/farmer/applications">
-            <Button variant="outline" className="w-full h-12">
-              View Applications
+            <Button variant="outline" className="w-full h-16 rounded-2xl text-lg font-black uppercase tracking-wide border-2 border-gray-100 hover:bg-gray-50">
+              Review Applications
             </Button>
           </Link>
         </div>

@@ -20,6 +20,8 @@ export default function WorkerSignupPage() {
     lastName: '',
     mobile: '+91 ',
     otp: '',
+    age: '',
+    experience: '',
     village: '',
     district: '',
     state: '',
@@ -89,6 +91,8 @@ export default function WorkerSignupPage() {
       state: form.state,
       latitude: form.latitude || '0',
       longitude: form.longitude || '0',
+      experience: form.experience,
+      age: form.age,
       skills: form.skills,
       travel_distance: form.travel_distance,
     })
@@ -115,21 +119,21 @@ export default function WorkerSignupPage() {
       <div className="w-full max-w-md">
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 shadow-lg mb-4">
-            <HardHat className="w-8 h-8 text-white" />
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-blue-600 shadow-2xl shadow-blue-200 mb-6 group hover:scale-105 transition-transform duration-300">
+            <HardHat className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Create Worker Profile</h1>
-          <p className="text-gray-500 mt-1">Start finding farm jobs near you</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase">Create Worker Profile</h1>
+          <p className="text-lg text-gray-500 mt-2 font-medium uppercase tracking-wide">Start finding farm jobs near you</p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-xl shadow-blue-100 border border-blue-50 p-8 space-y-5">
 
           {/* Name row */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">First Name</label>
               <input
                 id="worker-first-name"
                 type="text"
@@ -137,11 +141,11 @@ export default function WorkerSignupPage() {
                 value={form.firstName}
                 onChange={e => set('firstName', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Last Name</label>
               <input
                 id="worker-last-name"
                 type="text"
@@ -149,7 +153,35 @@ export default function WorkerSignupPage() {
                 value={form.lastName}
                 onChange={e => set('lastName', e.target.value)}
                 required
-                className="w-full px-3 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition"
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+              />
+            </div>
+          </div>
+
+          {/* New Row: Age & Experience */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Age</label>
+              <input
+                id="worker-age"
+                type="number"
+                placeholder="25"
+                value={form.age}
+                onChange={e => set('age', e.target.value)}
+                required
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-widest">Experience (Years)</label>
+              <input
+                id="worker-experience"
+                type="number"
+                placeholder="5"
+                value={form.experience}
+                onChange={e => set('experience', e.target.value)}
+                required
+                className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-lg focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-400 transition placeholder:text-gray-300"
               />
             </div>
           </div>

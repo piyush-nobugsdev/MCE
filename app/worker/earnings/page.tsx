@@ -110,15 +110,17 @@ export default function WorkerEarningsPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Card>
-            <CardContent className="pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <Card className="border-0 shadow-lg shadow-blue-100/50 rounded-3xl overflow-hidden">
+            <CardContent className="pt-8 pb-8">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-gray-600 text-sm">Total Earnings</p>
-                  <p className="text-2xl font-bold text-blue-600">${totalEarnings.toFixed(2)}</p>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Total Earnings</p>
+                  <p className="text-3xl font-black text-blue-600">₹{totalEarnings.toFixed(0)}</p>
                 </div>
-                <DollarSign className="w-8 h-8 text-blue-500 opacity-50" />
+                <div className="bg-blue-50 p-3 rounded-2xl">
+                  <DollarSign className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -179,10 +181,10 @@ export default function WorkerEarningsPage() {
                   </thead>
                   <tbody className="divide-y">
                     {payments.map((payment) => (
-                      <tr key={payment.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm">{payment.job_title}</td>
-                        <td className="px-6 py-4 text-sm font-semibold">
-                          ${payment.amount.toFixed(2)}
+                      <tr key={payment.id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-5 text-lg font-black text-gray-900 uppercase tracking-tight">{payment.job_title}</td>
+                        <td className="px-6 py-5 text-xl font-black text-blue-600 text-right">
+                          ₹{payment.amount.toFixed(0)}
                         </td>
                         <td className="px-6 py-4 text-sm">
                           <span

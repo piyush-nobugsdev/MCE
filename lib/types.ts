@@ -36,7 +36,9 @@ export interface Worker {
   user_id: string
   first_name: string
   last_name: string
-  full_name: string        // generated: first_name + ' ' + last_name
+  full_name: string
+  age: number | null
+  experience: number | null
   location: string
   latitude: number
   longitude: number
