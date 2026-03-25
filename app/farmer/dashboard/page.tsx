@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,12 +9,24 @@ import Link from 'next/link'
 import { Plus, Briefcase, Users, Star, IndianRupee, ChevronRight, MapPin } from 'lucide-react'
 import { Farmer, Job } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
+import { getReceivedReviews, getRatingSummary } from '@/app/actions/ratings'
 
 export default function FarmerDashboard() {
   const { t } = useLanguage()
   const [farmer, setFarmer] = useState<Farmer | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
+  const [reviews, setReviews] = useState<any[]>([])
+  const [ratingSummary, setRatingSummary] = useState({ average: 0, count: 0 })
   const [loading, setLoading] = useState(true)
+
+  const refreshReviews = useCallback(async (userId: string) => {
+    const [reviewsResult, summaryResult] = await Promise.all([
+      getReceivedReviews(userId, 'worker_to_farmer'),
+      getRatingSummary(userId, 'worker_to_farmer')
+    ])
+    if (reviewsResult.reviews) setReviews(reviewsResult.reviews)
+    if (summaryResult.count !== undefined) setRatingSummary(summaryResult as any)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +51,8 @@ export default function FarmerDashboard() {
           .eq('farmer_id', farmerData.id)
           .order('created_at', { ascending: false })
         if (jobsData) setJobs(jobsData)
+        
+        await refreshReviews(user.id)
       }
       setLoading(false)
     }
@@ -63,12 +77,12 @@ export default function FarmerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Welcome back, <span className="text-green-600">{farmer.full_name}!</span>
+            Welcome back, <span className="text-green-600">{farmer.first_name || farmer.full_name}!</span>
           </h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">Manage your farm and help workers find jobs</p>
         </div>
 
-        {/* Stats Section - Simple & Clear */}
+        {/* Stats Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
@@ -93,7 +107,9 @@ export default function FarmerDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-sm font-bold text-gray-400 mb-1">Your Rating</p>
-              <p className="text-4xl font-bold text-gray-900">{farmer.rating.toFixed(1)}</p>
+              <p className="text-4xl font-bold text-gray-900 flex items-center gap-2">
+                {ratingSummary.average.toFixed(1)} <span className="text-xl text-gray-200 font-medium">({ratingSummary.count})</span>
+              </p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
               <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
@@ -101,7 +117,7 @@ export default function FarmerDashboard() {
           </div>
         </div>
 
-        {/* Action Grid - Big & Obvious Buttons */}
+        {/* Action Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
           <Link href="/farmer/jobs/new">
             <Button className="w-full h-24 bg-green-600 hover:bg-green-700 rounded-3xl shadow-lg shadow-green-100 text-white flex items-center justify-between px-8">
@@ -128,7 +144,49 @@ export default function FarmerDashboard() {
           </Link>
         </div>
 
-        {/* List Section */}
+        {/* Recent Reviews - NEW! */}
+        {reviews.length > 0 && (
+          <div className="mb-16 space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <h2 className="text-2xl font-bold text-gray-900">Worker Feedback</h2>
+              <div className="flex items-center gap-1 text-sm font-bold text-yellow-600">
+                <Star className="w-4 h-4 fill-yellow-500" /> {ratingSummary.average.toFixed(1)}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {reviews.slice(0, 4).map((review) => (
+                <Card key={review.id} className="border border-gray-100 bg-white/50 rounded-3xl overflow-hidden shadow-sm">
+                  <CardContent className="p-8 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-100 fill-gray-100'}`} />
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</p>
+                    </div>
+                    {review.comment && (
+                      <p className="text-lg font-medium text-gray-700 leading-relaxed italic">
+                        "{review.comment}"
+                      </p>
+                    )}
+                    {review.tags && review.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {review.tags.map((tag: string) => (
+                            <span key={tag} className="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-black uppercase rounded-lg">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recent Jobs List */}
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
              <h2 className="text-2xl font-bold text-gray-900">{t('recent_jobs')}</h2>
@@ -174,4 +232,3 @@ export default function FarmerDashboard() {
     </div>
   )
 }
-

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { applyToJob } from '@/app/actions/jobs'
 import { markCompletion } from '@/app/actions/applications'
-import { rateUser } from '@/app/actions/ratings'
+import { RatingModal } from '@/components/rating-modal'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '@/app/worker/components/navbar'
@@ -44,9 +44,6 @@ export default function JobDetailPage() {
 
   // Rating modal state
   const [showRatingModal, setShowRatingModal] = useState(false)
-  const [rating, setRating] = useState(5)
-  const [ratingFeedback, setRatingFeedback] = useState('')
-  const [ratingLoading, setRatingLoading] = useState(false)
 
   const fetchData = async () => {
     const supabase = createClient()
@@ -140,21 +137,7 @@ export default function JobDetailPage() {
     }
   }
 
-  const handleRateFarmer = async () => {
-    if (!application) return
-    setRatingLoading(true)
-    const result = await rateUser(application.id, rating, ratingFeedback, 'worker_to_farmer')
-    setRatingLoading(false)
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      toast.success('Farmer rated successfully!')
-      setShowRatingModal(false)
-      setRating(5)
-      setRatingFeedback('')
-      await fetchData()
-    }
-  }
+
 
   if (loading) return <div className="flex items-center justify-center min-h-screen font-black uppercase text-gray-400">Loading details...</div>
   if (!job) return <div className="flex items-center justify-center min-h-screen text-red-500 font-black uppercase">Job Not Found</div>
@@ -477,62 +460,17 @@ export default function JobDetailPage() {
       </main>
 
       {/* Rating Modal */}
-      {showRatingModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md border-0 shadow-2xl rounded-[3rem]">
-            <CardContent className="p-10">
-              <div className="space-y-8">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Star className="w-8 h-8 text-yellow-500 fill-yellow-500" />
-                  </div>
-                  <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Rate the Farmer</h3>
-                  {farmer && <p className="text-gray-400 mt-2 font-bold uppercase text-xs tracking-widest">{farmer.first_name}</p>}
-                </div>
-
-                {/* Star Rating */}
-                <div className="space-y-3">
-                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Your Rating</p>
-                  <div className="flex justify-center gap-3">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => setRating(star)} className="transition-transform hover:scale-110 active:scale-95">
-                        <Star className={`w-10 h-10 transition-colors ${star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-200"}`} />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-center text-sm font-bold text-gray-400">{['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][rating]}</p>
-                </div>
-
-                {/* Feedback */}
-                <div className="space-y-3">
-                  <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Feedback</p>
-                  <select
-                    value={ratingFeedback}
-                    onChange={(e) => setRatingFeedback(e.target.value)}
-                    className="w-full p-4 border-2 border-gray-100 rounded-2xl font-medium text-gray-700 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-50 transition-all"
-                  >
-                    <option value="">Select feedback...</option>
-                    <option value="Reliable">Reliable</option>
-                    <option value="Fair pay">Fair pay</option>
-                    <option value="Good communication">Good communication</option>
-                    <option value="Poor conditions">Poor conditions</option>
-                    <option value="Unreliable">Unreliable</option>
-                  </select>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-4">
-                  <Button onClick={() => setShowRatingModal(false)} variant="outline" className="flex-1 h-14 rounded-2xl font-bold" disabled={ratingLoading}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleRateFarmer} className="flex-1 h-14 bg-yellow-500 hover:bg-yellow-600 rounded-2xl font-black" disabled={ratingLoading}>
-                    {ratingLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit Rating'}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {showRatingModal && application && farmer && (
+        <RatingModal
+          applicationId={application.id}
+          rateeDisplayName={farmer.first_name}
+          type="worker_to_farmer"
+          onSuccess={() => {
+            setShowRatingModal(false)
+            fetchData()
+          }}
+          onClose={() => setShowRatingModal(false)}
+        />
       )}
     </div>
   )

@@ -1,41 +1,57 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { Briefcase, Star, IndianRupee, ChevronRight, Search, DollarSign, CheckCheck } from 'lucide-react'
+import { Briefcase, Star, IndianRupee, ChevronRight, Search, DollarSign, CheckCheck, MessageSquare, Quote } from 'lucide-react'
 import { Worker, Job, WorkerApplicationDetails } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { getWorkerApplications, markCompletion } from '@/app/actions/applications'
-import { rateUser } from '@/app/actions/ratings'
+import { getReceivedReviews, getRatingSummary } from '@/app/actions/ratings'
 import { toast } from 'sonner'
+import { RatingModal } from '@/components/rating-modal'
 
 export default function WorkerDashboard() {
   const { t } = useLanguage()
   const [worker, setWorker] = useState<Worker | null>(null)
   const [jobs, setJobs] = useState<Job[]>([])
   const [applications, setApplications] = useState<WorkerApplicationDetails[]>([])
+  const [reviews, setReviews] = useState<any[]>([])
+  const [ratingSummary, setRatingSummary] = useState({ average: 0, count: 0 })
   const [loading, setLoading] = useState(true)
   const [completingId, setCompletingId] = useState<string | null>(null)
   const [ratingModal, setRatingModal] = useState<{
-    open: boolean
-    applicationId: string   // application.id, not job_id
+    applicationId: string
     farmerName: string
   } | null>(null)
-  const [rating, setRating] = useState(5)
-  const [feedback, setFeedback] = useState('')
-  const [ratingLoading, setRatingLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => { setMounted(true) }, [])
+  const supabaseRef = { current: createClient() }
 
-  const refreshApplications = async () => {
-    const appsResult = await getWorkerApplications()
-    if (appsResult.applications) setApplications(appsResult.applications as WorkerApplicationDetails[])
-  }
+  const fetchWorkerProfile = useCallback(async (userId: string) => {
+    const { data } = await supabaseRef.current
+      .from('workers')
+      .select('*')
+      .eq('user_id', userId)
+      .single()
+    if (data) setWorker(data)
+  }, [])
+
+  const refreshApplications = useCallback(async () => {
+    const result = await getWorkerApplications()
+    if (result.applications) setApplications(result.applications as WorkerApplicationDetails[])
+  }, [])
+
+  const refreshReviews = useCallback(async (userId: string) => {
+    const [reviewsResult, summaryResult] = await Promise.all([
+      getReceivedReviews(userId, 'farmer_to_worker'),
+      getRatingSummary(userId, 'farmer_to_worker')
+    ])
+    if (reviewsResult.reviews) setReviews(reviewsResult.reviews)
+    if (summaryResult.count !== undefined) setRatingSummary(summaryResult as any)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +67,11 @@ export default function WorkerDashboard() {
         const { data: jobsData } = await supabase
           .from('jobs').select('*').eq('status', 'open').order('created_at', { ascending: false })
         if (jobsData) setJobs(jobsData)
-        await refreshApplications()
+        
+        await Promise.all([
+          refreshApplications(),
+          refreshReviews(user.id)
+        ])
       }
       setLoading(false)
     }
@@ -62,32 +82,26 @@ export default function WorkerDashboard() {
     setCompletingId(applicationId)
     const result = await markCompletion(applicationId, 'worker')
     setCompletingId(null)
-    if (result.error) {
-      toast.error(result.error)
-    } else if (result.fullyCompleted) {
-      toast.success('Job fully completed! Both parties confirmed.')
-      await refreshApplications()
-    } else {
-      toast.success('Completion confirmed. Waiting for farmer.')
+    if (result.error) toast.error(result.error)
+    else {
+      toast.success(result.fullyCompleted ? 'Job fully completed! Both parties confirmed.' : 'Your completion confirmed. Waiting for farmer.')
       await refreshApplications()
     }
   }
 
-  const handleRateFarmer = async () => {
-    if (!ratingModal) return
-    setRatingLoading(true)
-    // IMPORTANT: pass application.id (not job_id) — rateUser looks up by applicationId
-    const result = await rateUser(ratingModal.applicationId, rating, feedback, 'worker_to_farmer')
-    setRatingLoading(false)
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      toast.success('Farmer rated successfully!')
-      setRatingModal(null)
-      setRating(5)
-      setFeedback('')
-      await refreshApplications()
+  const handleRatingSuccess = async () => {
+    setRatingModal(null)
+    // Re-fetch applications (to update worker_rated_farmer flag)
+    await refreshApplications()
+    // Re-fetch the worker's own profile and his reviews/summary
+    const { data: { user } } = await supabaseRef.current.auth.getUser()
+    if (user) {
+      await Promise.all([
+        fetchWorkerProfile(user.id),
+        refreshReviews(user.id)
+      ])
     }
+    toast.success('Your rating has been submitted successfully!')
   }
 
   if (loading) return <div className="p-10 text-center text-gray-400 font-bold">Loading...</div>
@@ -136,7 +150,10 @@ export default function WorkerDashboard() {
           <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
             <div>
               <p className="text-sm font-bold text-gray-400 mb-1">Your Rating</p>
-              <p className="text-4xl font-bold text-gray-900">{worker.rating.toFixed(1)}</p>
+              <p className="text-4xl font-bold text-gray-900 flex items-center gap-2">
+                {ratingSummary.average.toFixed(1)} <span className="text-xl text-gray-300 font-medium">({ratingSummary.count})</span>
+              </p>
+              <p className="text-xs text-gray-300 font-bold mt-1 uppercase tracking-widest">{worker.total_jobs_completed} jobs completed</p>
             </div>
             <div className="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
               <Star className="w-6 h-6 text-yellow-500 fill-yellow-500" />
@@ -162,19 +179,60 @@ export default function WorkerDashboard() {
           </Link>
         </div>
 
-        {/* Applications Section */}
+        {/* Recent Reviews - NEW! */}
+        {reviews.length > 0 && (
+          <div className="mb-16 space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <h2 className="text-2xl font-bold text-gray-900">What Farmers say about you</h2>
+              <div className="flex items-center gap-1 text-sm font-bold text-yellow-600">
+                <Star className="w-4 h-4 fill-yellow-500" /> {ratingSummary.average.toFixed(1)}
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {reviews.slice(0, 4).map((review) => (
+                <Card key={review.id} className="border border-gray-100 bg-white/50 rounded-3xl overflow-hidden shadow-sm">
+                  <CardContent className="p-8 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex gap-0.5">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star key={s} className={`w-3.5 h-3.5 ${s <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-100 fill-gray-100'}`} />
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{new Date(review.created_at).toLocaleDateString()}</p>
+                    </div>
+                    {review.comment && (
+                      <p className="text-lg font-medium text-gray-700 leading-relaxed italic">
+                        "{review.comment}"
+                      </p>
+                    )}
+                    {review.tags && review.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {review.tags.map((tag: string) => (
+                            <span key={tag} className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-lg">
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Applications */}
         {applications.length > 0 && (
           <div className="space-y-6 mb-16">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-bold text-gray-900">Your Applications</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Your Recent Applications</h2>
               <Link href="/worker/applications" className="text-sm font-bold text-blue-600 hover:underline">See All</Link>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
               {applications.slice(0, 4).map((app) => {
                 const isFullyCompleted = app.status === 'completed'
-                const isPendingWorker = app.status === 'accepted' && app.worker_completed && !app.farmer_completed
-                const farmerConfirmed = app.status === 'accepted' && app.farmer_completed && !app.worker_completed
+                const farmerConfirmed = (app as any).farmer_completed && !(app as any).worker_completed
 
                 return (
                   <div key={app.id} className="bg-white p-6 rounded-3xl border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
@@ -182,14 +240,12 @@ export default function WorkerDashboard() {
                       <div className="flex items-center gap-3 flex-wrap">
                         <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
                           isFullyCompleted ? 'bg-purple-50 text-purple-700' :
-                          isPendingWorker ? 'bg-blue-50 text-blue-700' :
                           farmerConfirmed ? 'bg-orange-50 text-orange-700' :
-                          app.status === 'pending' ? 'bg-yellow-50 text-yellow-700' :
                           app.status === 'accepted' ? 'bg-green-50 text-green-700' :
+                          app.status === 'pending' ? 'bg-yellow-50 text-yellow-700' :
                           'bg-red-50 text-red-700'
                         }`}>
                           {isFullyCompleted ? '✓ Completed' :
-                           isPendingWorker ? '⏳ Waiting for Farmer' :
                            farmerConfirmed ? '👆 Farmer Confirmed' :
                            app.status}
                         </span>
@@ -210,8 +266,7 @@ export default function WorkerDashboard() {
                         </p>
                       </div>
 
-                      {/* Mark Complete */}
-                      {app.status === 'accepted' && !app.worker_completed && (
+                      {app.status === 'accepted' && !(app as any).worker_completed && (
                         <Button
                           onClick={() => handleMarkComplete(app.id)}
                           disabled={completingId === app.id}
@@ -222,14 +277,17 @@ export default function WorkerDashboard() {
                         </Button>
                       )}
 
-                      {/* Rate Farmer — only after mutual completion */}
                       {isFullyCompleted && !app.worker_rated_farmer && (
                         <Button
-                          onClick={() => setRatingModal({ open: true, applicationId: app.id, farmerName: app.farmer_first_name })}
-                          className="h-10 bg-yellow-600 hover:bg-yellow-700 rounded-xl text-sm font-bold"
+                          onClick={() => setRatingModal({ applicationId: app.id, farmerName: app.farmer_first_name })}
+                          className="h-10 bg-yellow-500 hover:bg-yellow-600 rounded-xl text-sm font-bold"
                         >
-                          <Star className="w-4 h-4 mr-2" /> Rate
+                          <Star className="w-4 h-4 mr-2 fill-white" /> Rate Farmer
                         </Button>
+                      )}
+
+                      {isFullyCompleted && app.worker_rated_farmer && (
+                        <span className="text-xs font-bold text-green-600 bg-green-50 px-3 py-2 rounded-xl">✓ Rated</span>
                       )}
                     </div>
                   </div>
@@ -280,55 +338,14 @@ export default function WorkerDashboard() {
       </main>
 
       {/* Rating Modal */}
-      {mounted && ratingModal?.open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-8">
-              <div className="space-y-6">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">Rate Farmer</h3>
-                  <p className="text-gray-500 mt-2">Farmer: <span className="font-bold text-green-600">{ratingModal.farmerName}</span></p>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-bold text-gray-700">Rating</p>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => setRating(star)}>
-                        <Star className={`w-8 h-8 ${star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-bold text-gray-700">Feedback</p>
-                  <select
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-xl"
-                  >
-                    <option value="">Select feedback...</option>
-                    <option value="Good pay">Good pay</option>
-                    <option value="Fair treatment">Fair treatment</option>
-                    <option value="Clear instructions">Clear instructions</option>
-                    <option value="Delayed payment">Delayed payment</option>
-                    <option value="Poor conditions">Poor conditions</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button onClick={() => setRatingModal(null)} variant="outline" className="flex-1" disabled={ratingLoading}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleRateFarmer} className="flex-1 bg-yellow-600 hover:bg-yellow-700" disabled={ratingLoading}>
-                    {ratingLoading ? "Rating..." : "Submit Rating"}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {ratingModal && (
+        <RatingModal
+          applicationId={ratingModal.applicationId}
+          rateeDisplayName={ratingModal.farmerName}
+          type="worker_to_farmer"
+          onSuccess={handleRatingSuccess}
+          onClose={() => setRatingModal(null)}
+        />
       )}
     </div>
   )

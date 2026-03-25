@@ -9,7 +9,7 @@ import { ApplicationWithDetails } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { toast } from 'sonner'
 import { getFarmerApplications, updateApplicationStatus, markCompletion } from '@/app/actions/applications'
-import { rateUser } from '@/app/actions/ratings'
+import { RatingModal } from '@/components/rating-modal'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,13 +27,9 @@ export default function ApplicationsPage() {
   const [loading, setLoading] = useState(true)
   const [completingId, setCompletingId] = useState<string | null>(null)
   const [ratingModal, setRatingModal] = useState<{
-    open: boolean
     applicationId: string
     workerName: string
   } | null>(null)
-  const [rating, setRating] = useState(5)
-  const [feedback, setFeedback] = useState('')
-  const [ratingLoading, setRatingLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
@@ -81,21 +77,7 @@ export default function ApplicationsPage() {
     }
   }
 
-  const handleRateWorker = async () => {
-    if (!ratingModal) return
-    setRatingLoading(true)
-    const result = await rateUser(ratingModal.applicationId, rating, feedback, 'farmer_to_worker')
-    setRatingLoading(false)
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      toast.success('Worker rated successfully!')
-      setRatingModal(null)
-      setRating(5)
-      setFeedback('')
-      await refresh()
-    }
-  }
+
 
   // Group applications by job title
   const applicationsByJob = applications.reduce((acc, app) => {
@@ -257,7 +239,7 @@ export default function ApplicationsPage() {
                               {/* Rate Worker — only after both sides confirmed */}
                               {isFullyCompleted && !app.farmer_rated_worker && (
                                 <Button
-                                  onClick={() => setRatingModal({ open: true, applicationId: app.id, workerName: app.worker_first_name })}
+                                  onClick={() => setRatingModal({ applicationId: app.id, workerName: app.worker_first_name })}
                                   className="w-full h-11 bg-yellow-600 hover:bg-yellow-700 rounded-xl text-sm font-bold"
                                 >
                                   <Star className="w-4 h-4 mr-2" /> Rate Worker
@@ -290,55 +272,17 @@ export default function ApplicationsPage() {
       </main>
 
       {/* Rating Modal */}
-      {mounted && ratingModal?.open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-8">
-              <div className="space-y-6">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">Rate Worker</h3>
-                  <p className="text-gray-500 mt-2">Rating <span className="font-bold text-blue-600">{ratingModal.workerName}</span></p>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-bold text-gray-700">Rating</p>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => setRating(star)}>
-                        <Star className={`w-8 h-8 ${star <= rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-sm font-bold text-gray-700">Feedback</p>
-                  <select
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                    className="w-full p-3 border border-gray-200 rounded-xl"
-                  >
-                    <option value="">Select feedback...</option>
-                    <option value="Punctual">Punctual</option>
-                    <option value="Hard working">Hard working</option>
-                    <option value="Skilled">Skilled</option>
-                    <option value="Did not show">Did not show</option>
-                    <option value="Poor work">Poor work</option>
-                  </select>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button onClick={() => setRatingModal(null)} variant="outline" className="flex-1" disabled={ratingLoading}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleRateWorker} className="flex-1 bg-yellow-600 hover:bg-yellow-700" disabled={ratingLoading}>
-                    {ratingLoading ? "Rating..." : "Submit Rating"}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {mounted && ratingModal && (
+        <RatingModal
+          applicationId={ratingModal.applicationId}
+          rateeDisplayName={ratingModal.workerName}
+          type="farmer_to_worker"
+          onSuccess={() => {
+            setRatingModal(null)
+            refresh()
+          }}
+          onClose={() => setRatingModal(null)}
+        />
       )}
     </div>
   )
