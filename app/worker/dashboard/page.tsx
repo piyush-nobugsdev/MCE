@@ -44,14 +44,14 @@ export default function WorkerDashboard() {
         const { data: jobsData } = await supabase
           .from('jobs')
           .select('*')
-          .eq('status', 'posted')
+          .eq('status', 'open')
           .order('created_at', { ascending: false })
           .limit(6)
 
         if (jobsData) {
           // Check which jobs the worker has applied to
           const { data: applicationsData } = await supabase
-            .from('job_applications')
+            .from('applications')
             .select('job_id')
             .eq('worker_id', workerData.id)
 

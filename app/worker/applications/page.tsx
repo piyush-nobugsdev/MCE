@@ -42,7 +42,7 @@ export default function WorkerApplicationsPage() {
 
       if (worker) {
         const { data: appsData } = await supabase
-          .from('job_applications')
+          .from('applications')
           .select('*')
           .eq('worker_id', worker.id)
           .order('created_at', { ascending: false })
@@ -59,11 +59,12 @@ export default function WorkerApplicationsPage() {
               let farmerName = 'Unknown Farmer'
               if (jobData) {
                 const { data: farmerData } = await supabase
-                  .from('farmers')
-                  .select('name')
-                  .eq('id', jobData.farmer_id)
-                  .single()
-                farmerName = farmerData?.name || 'Unknown Farmer'
+  .from('farmers')
+  .select('full_name')    // was: name
+  .eq('id', jobData.farmer_id)
+  .single()
+
+                farmerName = farmerData?.full_name || 'Unknown Farmer'
               }
 
               return {
