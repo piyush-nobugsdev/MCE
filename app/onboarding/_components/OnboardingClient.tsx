@@ -1,24 +1,25 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import FarmerOnboardingForm from './farmerOnboardingForm'
-import WorkerOnboardingForm from './workerOnboardingForm'
 
-export default function OnboardingClient() {
-  const [role, setRole] = useState<string | null>(null)
+type OnboardingClientProps = {
+  initialRole?: string
+}
+
+export default function OnboardingClient({ initialRole }: OnboardingClientProps) {
+  const [role, setRole] = useState(initialRole ?? '')
 
   useEffect(() => {
-    const r = localStorage.getItem('pending_role')
-    setRole(r)
-  }, [])
+    if (!initialRole) {
+      const urlParams = new URLSearchParams(window.location.search)
+      const roleParam = urlParams.get('role')
+      if (roleParam) setRole(roleParam)
+    }
+  }, [initialRole])
 
-  if (!role) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <p className="text-gray-500">Loading...</p>
+  return (
+    <div>
+      <p>Initial role: {role}</p>
     </div>
   )
-
-  return role === 'farmer'
-    ? <FarmerOnboardingForm />
-    : <WorkerOnboardingForm />
 }

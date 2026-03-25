@@ -5,8 +5,10 @@ import OnboardingClient from './_components/OnboardingClient'
 export default async function OnboardingPage({
   searchParams,
 }: {
-  searchParams: { role?: string }
+  searchParams: Promise<{ role?: string }>
 }) {
+  const { role } = await searchParams
+
   const supabase = await createClient()
 
   const {
@@ -15,12 +17,10 @@ export default async function OnboardingPage({
 
   console.log('onboarding page user:', user?.id)
 
-  // If no session at all, send back to auth
   if (!user) {
     redirect('/auth/role-selection')
   }
 
-  // If they already have a profile, send to the correct dashboard
   const { data: farmer } = await supabase
     .from('farmers')
     .select('id')
@@ -35,8 +35,5 @@ export default async function OnboardingPage({
     .maybeSingle()
   if (worker) redirect('/worker/dashboard')
 
-  // Has session, no profile yet — pass role hint to the client so it can
-  // redirect to the correct signup form (query param takes priority over
-  // whatever was stored in localStorage, which OnboardingClient handles).
-  return <OnboardingClient initialRole={searchParams.role} />
+  return <OnboardingClient initialRole={role} />
 }
