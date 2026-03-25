@@ -1,68 +1,68 @@
 'use server'
-
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function signUpWithPhone(phone: string) {
   const supabase = await createClient()
-
   const { error } = await supabase.auth.signInWithOtp({
     phone,
   })
-
   if (error) {
     return { error: error.message }
   }
-
   return { success: true }
 }
 
 export async function verifyOtp(phone: string, token: string) {
   const supabase = await createClient()
-
   const { error } = await supabase.auth.verifyOtp({
     phone,
     token,
     type: 'sms',
   })
-
   if (error) {
     return { error: error.message }
   }
-
   revalidatePath('/', 'layout')
   return { success: true }
 }
+
 export async function signUpAsRole(
   role: 'farmer' | 'worker',
   data: Record<string, string>
 ) {
   const supabase = await createClient()
-  
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  
+
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser()
+
   console.log('1. user id:', user?.id)
   console.log('1. authError:', authError)
-
   if (!user) {
     console.log('FAILING: no user')
     return { error: 'Not authenticated' }
   }
 
   // Support both firstName+lastName and legacy name field
-  const full_name = data.firstName && data.lastName
-    ? `${data.firstName.trim()} ${data.lastName.trim()}`
-    : data.name ?? ''
+  const full_name =
+    data.firstName && data.lastName
+      ? `${data.firstName.trim()} ${data.lastName.trim()}`
+      : (data.name ?? '')
 
+  // Upsert so the row is created on first sign-up and safely updated on retry
   const { error: userError } = await supabase.from('users').upsert({
     id: user.id,
     auth_provider: user.app_metadata?.provider ?? 'phone',
-    phone: data.mobile ?? user.phone ?? null,
+    // Prefer the phone supplied in the form; fall back to the auth user's phone
+    phone:
+      data.mobile ??
+      (user.phone && user.phone !== '' ? user.phone : null),
   })
 
   console.log('2. userError:', userError?.message)
-
   if (userError) {
     return { error: userError.message }
   }
@@ -71,7 +71,9 @@ export async function signUpAsRole(
     const { error } = await supabase.from('farmers').insert({
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
-      last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
+      last_name:
+        (data.lastName?.trim() ??
+          full_name.split(' ').slice(1).join(' ')) || '',
       village: data.village,
       district: data.district,
       state: data.state,
@@ -80,19 +82,18 @@ export async function signUpAsRole(
         lng: parseFloat(data.longitude),
       },
     })
-
     console.log('3. farmer insert error:', error?.message)
     console.log('3. farmer insert error code:', error?.code)
-
     if (error) {
       return { error: error.message }
     }
-
   } else {
     const { error } = await supabase.from('workers').insert({
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
-      last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
+      last_name:
+        (data.lastName?.trim() ??
+          full_name.split(' ').slice(1).join(' ')) || '',
       village: data.village,
       district: data.district,
       state: data.state,
@@ -100,13 +101,15 @@ export async function signUpAsRole(
         lat: parseFloat(data.latitude),
         lng: parseFloat(data.longitude),
       },
-      skills: data.skills?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
+      skills:
+        data.skills
+          ?.split(',')
+          .map((s) => s.trim())
+          .filter(Boolean) ?? [],
       travel_distance_preference: parseInt(data.travel_distance ?? '10'),
     })
-
     console.log('3. worker insert error:', error?.message)
     console.log('3. worker insert error code:', error?.code)
-
     if (error) {
       return { error: error.message }
     }
@@ -116,6 +119,7 @@ export async function signUpAsRole(
   revalidatePath('/', 'layout')
   redirect(role === 'farmer' ? '/farmer/dashboard' : '/worker/dashboard')
 }
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()

@@ -1,60 +1,42 @@
-'use client'
+import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
+import OnboardingClient from './_components/OnboardingClient'
 
-import { Suspense, useEffect } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+export default async function OnboardingPage({
+  searchParams,
+}: {
+  searchParams: { role?: string }
+}) {
+  const supabase = await createClient()
 
-function OnboardingContent() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  useEffect(() => {
-    const checkProfile = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      
-      if (!user) {
-        router.push('/auth/role-selection')
-        return
-      }
+  console.log('onboarding page user:', user?.id)
 
-      // Check if profile already exists
-      const { data: farmer } = await supabase.from('farmers').select('id').eq('user_id', user.id).maybeSingle()
-      if (farmer) {
-        router.push('/farmer/dashboard')
-        return
-      }
+  // If no session at all, send back to auth
+  if (!user) {
+    redirect('/auth/role-selection')
+  }
 
-      const { data: worker } = await supabase.from('workers').select('id').eq('user_id', user.id).maybeSingle()
-      if (worker) {
-        router.push('/worker/dashboard')
-        return
-      }
+  // If they already have a profile, send to the correct dashboard
+  const { data: farmer } = await supabase
+    .from('farmers')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (farmer) redirect('/farmer/dashboard')
 
-      // Determine role — priority: query param > localStorage
-      const queryRole = searchParams.get('role')
-      const storageRole = localStorage.getItem('pending_role')
-      const role = queryRole || storageRole
+  const { data: worker } = await supabase
+    .from('workers')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  if (worker) redirect('/worker/dashboard')
 
-      if (role === 'farmer') {
-        router.push('/auth/farmer/signup')
-      } else if (role === 'worker') {
-        router.push('/auth/worker/signup')
-      } else {
-        router.push('/auth/role-selection')
-      }
-    }
-
-    checkProfile()
-  }, [searchParams, router])
-
-  return <div>Loading...</div>
-}
-
-export default function OnboardingPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <OnboardingContent />
-    </Suspense>
-  )
+  // Has session, no profile yet — pass role hint to the client so it can
+  // redirect to the correct signup form (query param takes priority over
+  // whatever was stored in localStorage, which OnboardingClient handles).
+  return <OnboardingClient initialRole={searchParams.role} />
 }

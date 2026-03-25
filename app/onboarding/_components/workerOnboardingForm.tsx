@@ -55,7 +55,7 @@ export default function WorkerOnboardingForm() {
       toast.error(result.error)
       setLoading(false)
     }
-    // redirect handled in server action
+    // redirect is handled inside signUpAsRole server action
   }
 
   return (
