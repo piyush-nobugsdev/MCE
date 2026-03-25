@@ -42,11 +42,7 @@ export async function signUpAsRole(
   
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   
-  console.log('1. user id:', user?.id)
-  console.log('1. authError:', authError)
-
   if (!user) {
-    console.log('FAILING: no user')
     return { error: 'Not authenticated' }
   }
 
@@ -60,8 +56,6 @@ export async function signUpAsRole(
     auth_provider: user.app_metadata?.provider ?? 'phone',
     phone: data.mobile ?? user.phone ?? null,
   })
-
-  console.log('2. userError:', userError?.message)
 
   if (userError) {
     return { error: userError.message }
@@ -80,9 +74,6 @@ export async function signUpAsRole(
         lng: parseFloat(data.longitude),
       },
     })
-
-    console.log('3. farmer insert error:', error?.message)
-    console.log('3. farmer insert error code:', error?.code)
 
     if (error) {
       return { error: error.message }
@@ -106,15 +97,11 @@ export async function signUpAsRole(
       travel_distance_preference: parseInt(data.travel_distance ?? '10'),
     })
 
-    console.log('3. worker insert error:', error?.message)
-    console.log('3. worker insert error code:', error?.code)
-
     if (error) {
       return { error: error.message }
     }
   }
 
-  console.log('4. reached redirect')
   revalidatePath('/', 'layout')
   redirect(role === 'farmer' ? '/farmer/dashboard' : '/worker/dashboard')
 }

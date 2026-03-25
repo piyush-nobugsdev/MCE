@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 export async function createJob(data: {
@@ -25,8 +25,6 @@ export async function createJob(data: {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-  console.log('1. user:', user?.id)
-
   if (!user) return { error: 'Not authenticated' }
 
   const { data: farmer, error: farmerError } = await supabase
@@ -34,9 +32,6 @@ export async function createJob(data: {
     .select('id')
     .eq('user_id', user.id)
     .single()
-
-  console.log('2. farmer:', farmer?.id)
-  console.log('2. farmerError:', farmerError?.message)
 
   if (!farmer) return { error: 'Farmer profile not found' }
 
@@ -73,12 +68,10 @@ const { data: job, error } = await supabase
     .select()
     .single()
 
-  console.log('3. job insert error:', error?.message)
-  console.log('3. job insert error code:', error?.code)
 
   if (error) return { error: error.message }
 
-  revalidateTag('jobs')
+  revalidatePath('/farmer/dashboard')
   redirect('/farmer/dashboard')
 }
 
@@ -109,7 +102,6 @@ export async function getJobs(filters?: {
 
   const { data, error } = await query.order('created_at', { ascending: false })
 
-  console.log('getJobs error:', error?.message)
 
   if (error) return { error: error.message }
 
@@ -172,11 +164,10 @@ export async function applyToJob(jobId: string) {
     .select()
     .single()
 
-  console.log('applyToJob error:', error?.message)
 
   if (error) return { error: error.message }
 
-  revalidateTag('applications', 'revalidate')
+  revalidatePath('/worker/applications')
   return { application }
 }
 
@@ -193,6 +184,6 @@ export async function updateJobStatus(
 
   if (error) return { error: error.message }
 
-  revalidateTag('jobs', 'revalidate')
+  revalidatePath('/farmer/dashboard')
   return { success: true }
-}
+}

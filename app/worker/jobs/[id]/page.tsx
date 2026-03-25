@@ -4,17 +4,18 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { applyToJob } from '@/app/actions/jobs'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { WorkerNavbar } from '../../components/navbar'
 import { toast } from 'sonner'
-import { MapPin, DollarSign, Users, Calendar } from 'lucide-react'
+import { MapPin, IndianRupee, Users, Calendar, ChevronLeft, Sparkles, Star, CheckCircle2, Loader2, MessageSquare } from 'lucide-react'
 import { Job, Farmer } from '@/lib/types'
+import { useLanguage } from '@/lib/i18n/context'
 
 export default function JobDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { t } = useLanguage()
   const jobId = params.id as string
 
   const [job, setJob] = useState<Job | null>(null)
@@ -27,9 +28,7 @@ export default function JobDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+      const { data: { user } } = await supabase.auth.getUser()
 
       // Fetch job details
       const { data: jobData } = await supabase
@@ -40,19 +39,15 @@ export default function JobDetailPage() {
 
       if (jobData) {
         setJob(jobData)
-
         // Fetch farmer details
         const { data: farmerData } = await supabase
           .from('farmers')
           .select('*')
           .eq('id', jobData.farmer_id)
           .single()
+        if (farmerData) setFarmer(farmerData)
 
-        if (farmerData) {
-          setFarmer(farmerData)
-        }
-
-        // Check if worker has already applied
+        // Check if already applied
         if (user) {
           const { data: worker } = await supabase
             .from('workers')
@@ -62,224 +57,194 @@ export default function JobDetailPage() {
 
           if (worker) {
             const { data: application } = await supabase
-              .from('job_applications')
+              .from('applications')
               .select('id')
               .eq('worker_id', worker.id)
               .eq('job_id', jobId)
               .single()
-
-            if (application) {
-              setHasApplied(true)
-            }
+            if (application) setHasApplied(true)
           }
         }
       }
-
       setLoading(false)
     }
-
     fetchData()
   }, [jobId])
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault()
     setApplying(true)
-
     const result = await applyToJob(jobId)
-
     if (result.error) {
       toast.error(result.error)
       setApplying(false)
     } else {
-      toast.success('Application submitted successfully!')
-      setMessage('')
+      toast.success('Wait for farmer to accept!')
       setHasApplied(true)
       setApplying(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    )
-  }
-
-  if (!job) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-500">Job not found</p>
-      </div>
-    )
-  }
+  if (loading) return <div className="flex items-center justify-center min-h-screen font-black uppercase text-gray-400">Loading details...</div>
+  if (!job) return <div className="flex items-center justify-center min-h-screen text-red-500 font-black uppercase">Job Not Found</div>
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50/50 font-sans pb-20">
       <WorkerNavbar />
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        <Button
-          variant="outline"
+      <main className="max-w-7xl mx-auto px-6 py-12">
+        <button 
           onClick={() => router.back()}
-          className="mb-6"
+          className="inline-flex items-center gap-2 mb-10 text-gray-400 font-black uppercase tracking-widest text-xs hover:text-blue-600 transition-colors group"
         >
-          ← Back to Jobs
-        </Button>
+          <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+          {t('back')}
+        </button>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-3xl">{job.title}</CardTitle>
-                <div className="flex gap-4 mt-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {typeof job.location === 'string' ? job.location : job.location?.name || 'Unknown location'}
-                  </div>
-                  <div className="flex items-center gap-1">
-                  <DollarSign className="w-4 h-4" />
-                    ${job.wage_amount}/day
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Job Description */}
-                <div>
-                  <h3 className="font-semibold text-lg mb-2">Job Description</h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">{job.description}</p>
-                </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+          
+          {/* Main Info Column */}
+          <div className="lg:col-span-8 space-y-12">
+            
+            {/* Header Card */}
+            <div className="space-y-6">
+               <div className="flex flex-wrap gap-4">
+                  <span className="px-6 py-2 bg-blue-100 text-blue-700 text-[10px] font-black uppercase tracking-widest rounded-xl flex items-center gap-2">
+                    <Sparkles className="w-3 h-3" /> {t('available_work')}
+                  </span>
+                  <span className="px-6 py-2 bg-white text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-xl border border-gray-100 flex items-center gap-2">
+                    <Calendar className="w-3 h-3 text-gray-300" /> Posted on {new Date(job.created_at).toLocaleDateString()}
+                  </span>
+               </div>
+               <h1 className="text-6xl font-black text-gray-900 uppercase tracking-tight leading-[1.1]">
+                 {job.title}
+               </h1>
+            </div>
 
-                {/* Job Details */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm text-gray-600">Workers Needed</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Users className="w-5 h-5 text-blue-600" />
-                      <span className="text-lg font-semibold">{job.workers_needed}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm text-gray-600">Job Duration</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Calendar className="w-5 h-5 text-green-600" />
-                      <span className="text-lg font-semibold">
-                        {Math.ceil(
-                          (new Date(job.end_date).getTime() -
-                            new Date(job.start_date).getTime()) /
-                            (1000 * 60 * 60 * 24)
-                        )}{' '}
-                        days
-                      </span>
-                    </div>
-                  </div>
-                </div>
+            {/* Metrics Bar */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-8 p-10 bg-white rounded-[3rem] shadow-2xl shadow-blue-50/50 border border-gray-100">
+               <div className="space-y-2">
+                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Daily Wage</p>
+                  <p className="text-3xl font-black text-green-600 flex items-center gap-1">
+                    <IndianRupee className="w-6 h-6" /> {job.wage_amount}
+                  </p>
+               </div>
+               <div className="space-y-2">
+                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Duration</p>
+                  <p className="text-3xl font-black text-gray-900 flex items-center gap-1 uppercase">
+                    {Math.ceil((new Date(job.end_date).getTime() - new Date(job.start_date).getTime()) / (1000 * 3600 * 24))} Days
+                  </p>
+               </div>
+               <div className="space-y-2 hidden md:block">
+                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Openings</p>
+                  <p className="text-3xl font-black text-gray-900 flex items-center gap-1 uppercase">
+                    <Users className="w-6 h-6 text-blue-400" /> {job.workers_needed}
+                  </p>
+               </div>
+            </div>
 
-                {/* Dates */}
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-semibold mb-2">Schedule</h4>
-                  <div className="space-y-2 text-sm">
-                    <div>
-                      <span className="text-gray-600">Start Date:</span>
-                      <span className="ml-2 font-medium">
-                        {new Date(job.start_date).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <div>
-                      <span className="text-gray-600">End Date:</span>
-                      <span className="ml-2 font-medium">
-                        {new Date(job.end_date).toLocaleDateString()}
-                      </span>
-                    </div>
+            {/* Description Card */}
+            <Card className="border-0 shadow-2xl shadow-gray-100 rounded-[3rem] bg-white p-12 overflow-hidden relative">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50/50 rounded-bl-[5rem] -mr-16 -mt-16" />
+               <div className="space-y-8 relative">
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em] flex items-center gap-3">
+                       <MapPin className="w-4 h-4 text-blue-500" /> Detailed Location
+                    </h3>
+                    <p className="text-2xl font-black text-gray-900 uppercase">
+                       {typeof job.location === 'string' ? job.location : job.location?.name}
+                    </p>
                   </div>
-                </div>
-              </CardContent>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.3em]">Work Description</h3>
+                    <p className="text-xl font-medium text-gray-600 leading-relaxed whitespace-pre-wrap">
+                       {job.description}
+                    </p>
+                  </div>
+               </div>
             </Card>
 
             {/* Farmer Info */}
             {farmer && (
-              <Card className="mt-8">
-                <CardHeader>
-                  <CardTitle className="text-xl">About the Farmer</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm text-gray-600">Farm Name</label>
-                      <p className="font-semibold">{farmer.farm_name}</p>
+              <Card className="border-0 shadow-2xl shadow-orange-50 rounded-[3rem] bg-orange-50/30 p-12 flex flex-col md:flex-row items-center gap-10">
+                 <div className="w-24 h-24 rounded-[2.5rem] bg-orange-100 flex items-center justify-center shadow-xl">
+                   <Users className="w-12 h-12 text-orange-600" />
+                 </div>
+                 <div className="flex-1 text-center md:text-left space-y-2">
+                    <p className="text-[10px] font-black text-orange-400 uppercase tracking-[0.3em]">Land Owner / Farmer</p>
+                    <h4 className="text-3xl font-black text-gray-900 uppercase">{farmer.first_name}</h4>
+                    <div className="flex items-center justify-center md:justify-start gap-4">
+                       <div className="px-4 py-2 bg-white rounded-xl text-yellow-600 font-black text-lg flex items-center gap-2 shadow-sm">
+                         <Star className="w-5 h-5 fill-yellow-500" /> {farmer.rating.toFixed(1)}
+                       </div>
+                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{farmer.farm_name}</p>
                     </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Farmer Name</label>
-                      <p className="font-semibold">{farmer.full_name}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Location</label>
-                      <p className="font-semibold">{farmer.location}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm text-gray-600">Rating</label>
-                      <p className="font-semibold text-yellow-600">
-                        {farmer.rating.toFixed(1)} ⭐
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
+                 </div>
               </Card>
             )}
+
           </div>
 
-          {/* Application Form */}
-          <div>
-            {hasApplied ? (
-              <Card className="sticky top-8">
-                <CardContent className="pt-6 text-center">
-                  <div className="text-4xl mb-2">✓</div>
-                  <h3 className="font-semibold text-lg mb-2">Already Applied</h3>
-                  <p className="text-gray-600 text-sm">
-                    You've already applied for this job. Check your applications for updates.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="sticky top-8">
-                <CardHeader>
-                  <CardTitle>Apply for This Job</CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                  <form onSubmit={handleApply} className="space-y-4">
-                    <div>
-                      <label htmlFor="message" className="block text-sm font-medium mb-2">
-                        Add a Message (Optional)
-                      </label>
-                      <textarea
-                        id="message"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Tell the farmer about your experience or interest in this job..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        rows={4}
-                        disabled={applying}
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700"
-                      disabled={applying}
-                    >
-                      {applying ? 'Submitting...' : 'Apply Now'}
-                    </Button>
-
-                    <p className="text-xs text-gray-500 text-center">
-                      By applying, you agree to the terms and conditions
+          {/* Action Column */}
+          <div className="lg:col-span-4">
+             <div className="sticky top-12 space-y-8">
+               
+               {hasApplied ? (
+                 <Card className="border-0 shadow-2xl shadow-green-100 rounded-[3.5rem] bg-green-600 p-12 text-center text-white overflow-hidden relative">
+                    <div className="absolute -right-8 -bottom-8 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                    <CheckCircle2 className="w-24 h-24 text-white mx-auto mb-8 animate-bounce" />
+                    <h3 className="text-3xl font-black uppercase tracking-tight mb-4">Application Sent</h3>
+                    <p className="text-white/60 font-black uppercase text-xs tracking-widest leading-loose">
+                      The farmer is reviewing your profile. You will be notified soon.
                     </p>
-                  </form>
-                </CardContent>
-              </Card>
-            )}
+                 </Card>
+               ) : (
+                 <Card className="border-0 shadow-2xl shadow-blue-100 rounded-[3.5rem] bg-white p-10 space-y-8">
+                    <div className="space-y-2">
+                       <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight">Apply Today</h3>
+                       <p className="text-xs font-medium text-gray-400 uppercase tracking-widest">Submit your interest to the farmer</p>
+                    </div>
+
+                    <form onSubmit={handleApply} className="space-y-6">
+                       <div className="space-y-3">
+                         <label className="text-[10px] font-black text-gray-300 uppercase tracking-widest pl-2">Personal Message (Optional)</label>
+                         <div className="relative">
+                            <MessageSquare className="absolute left-6 top-6 w-5 h-5 text-gray-300" />
+                            <textarea
+                              value={message}
+                              onChange={(e) => setMessage(e.target.value)}
+                              placeholder="e.g. I have 5 years experience in paddy harvesting..."
+                              className="w-full pl-16 pr-6 py-6 border-2 border-gray-50 rounded-[2rem] text-sm font-medium focus:ring-8 focus:ring-blue-50 focus:border-blue-400 transition-all min-h-[140px] resize-none"
+                              disabled={applying}
+                            />
+                         </div>
+                       </div>
+
+                       <Button
+                         type="submit"
+                         disabled={applying}
+                         className="w-full h-24 bg-blue-600 hover:bg-blue-700 rounded-[2rem] text-xl font-black uppercase tracking-widest shadow-2xl shadow-blue-100 transition-all active:scale-95 group"
+                       >
+                         {applying ? <Loader2 className="w-8 h-8 animate-spin" /> : (
+                           <div className="flex items-center gap-3">
+                             {t('apply')} <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+                           </div>
+                         )}
+                       </Button>
+                    </form>
+
+                    <div className="px-6 py-4 bg-gray-50 rounded-2xl flex items-center gap-4">
+                       <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                       </div>
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Work Opportunity</p>
+                    </div>
+                 </Card>
+               )}
+
+             </div>
           </div>
+
         </div>
       </main>
     </div>

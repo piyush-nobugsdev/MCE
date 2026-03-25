@@ -46,7 +46,7 @@ export interface Worker {
   avatar_url: string | null
   skills: string[]
   rating: number
-  total_jobs_completed: number
+  total_earned: number
   anonymous_code: string
   created_at: string
   updated_at: string
@@ -139,4 +139,17 @@ export interface Notification {
   read: boolean
   action_url: string | null
   created_at: string
+}
+
+export interface ApplicationWithDetails {
+  id: string
+  status: string
+  message: string | null
+  job_id: string
+  worker_id: string
+  job_title: string
+  worker_first_name: string
+  worker_age: number | null
+  worker_experience: number | null
+  worker_rating: number | null
 }
