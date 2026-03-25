@@ -79,7 +79,7 @@ export default function JobDetailPage() {
       toast.error(result.error)
       setApplying(false)
     } else {
-      toast.success('Wait for farmer to accept!')
+      toast.success(`Applied successfully! Your code is ${result.worker_code} — save this for attendance`)
       setHasApplied(true)
       setApplying(false)
     }

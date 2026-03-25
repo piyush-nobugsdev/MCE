@@ -144,12 +144,27 @@ export interface Notification {
 export interface ApplicationWithDetails {
   id: string
   status: string
-  message: string | null
-  job_id: string
-  worker_id: string
+  applied_at: string
+  worker_code: string
+  worker_first_name?: string
   job_title: string
-  worker_first_name: string
-  worker_age: number | null
-  worker_experience: number | null
-  worker_rating: number | null
+  job_status?: string
+  worker_rating: number
+  worker_completed_jobs: number
+  worker_skills: string[]
+  distance: number | null
+  farmer_rated_worker?: boolean
+}
+
+export interface WorkerApplicationDetails {
+  id: string
+  status: ApplicationStatus
+  applied_at: string
+  worker_rated_farmer: boolean
+  job_id: string
+  job_title: string
+  job_location: any
+  job_wage: number
+  job_status: JobStatus
+  farmer_code: string
 }
