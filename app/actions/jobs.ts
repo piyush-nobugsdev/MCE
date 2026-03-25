@@ -78,7 +78,7 @@ const { data: job, error } = await supabase
 
   if (error) return { error: error.message }
 
-  revalidateTag('jobs')
+  revalidateTag('jobs', 'revalidate')
   redirect('/farmer/dashboard')
 }
 

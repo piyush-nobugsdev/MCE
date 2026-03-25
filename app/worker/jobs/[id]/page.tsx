@@ -85,7 +85,7 @@ export default function JobDetailPage() {
     e.preventDefault()
     setApplying(true)
 
-    const result = await applyToJob(jobId, message)
+    const result = await applyToJob(jobId)
 
     if (result.error) {
       toast.error(result.error)
@@ -139,8 +139,12 @@ export default function JobDetailPage() {
                     {typeof job.location === 'string' ? job.location : job.location?.name || 'Unknown location'}
                   </div>
                   <div className="flex items-center gap-1">
-                    <DollarSign className="w-4 h-4" />
+                  <DollarSign className="w-4 h-4" />
                     ${job.wage_amount}/day
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
                 {/* Job Description */}
                 <div>
                   <h3 className="font-semibold text-lg mb-2">Job Description</h3>
@@ -207,7 +211,7 @@ export default function JobDetailPage() {
                     </div>
                     <div>
                       <label className="text-sm text-gray-600">Farmer Name</label>
-                      <p className="font-semibold">{farmer.name}</p>
+                      <p className="font-semibold">{farmer.full_name}</p>
                     </div>
                     <div>
                       <label className="text-sm text-gray-600">Location</label>
