@@ -53,7 +53,7 @@ export default function FarmerDashboard() {
     </div>
   )
 
-  const activeJobs = jobs.filter((j) => j.status === 'posted').length
+  const activeJobs = jobs.filter((j) => j.status === 'open').length
   const completedJobs = jobs.filter((j) => j.status === 'completed').length
 
   return (
@@ -63,7 +63,7 @@ export default function FarmerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Welcome back, <span className="text-green-600">{farmer.first_name}!</span>
+            Welcome back, <span className="text-green-600">{farmer.full_name}!</span>
           </h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">Manage your farm and help workers find jobs</p>
         </div>
@@ -147,9 +147,9 @@ export default function FarmerDashboard() {
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
                         <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                          job.status === 'posted' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
+                          job.status === 'open' ? 'bg-blue-50 text-blue-700' : 'bg-green-50 text-green-700'
                         }`}>
-                          {job.status === 'posted' ? 'Live' : 'Closed'}
+                          {job.status === 'open' ? 'Live' : 'Closed'}
                         </span>
                         <span className="text-xs font-bold text-gray-400">📍 {typeof job.location === 'string' ? job.location : job.location?.name}</span>
                       </div>

@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '../../components/navbar'
 import { toast } from 'sonner'
-import { MapPin, IndianRupee, Users, Calendar, ChevronLeft, Sparkles, Star, CheckCircle2, Loader2, MessageSquare } from 'lucide-react'
+import { MapPin, IndianRupee, Users, Calendar, ChevronLeft, ChevronRight, Sparkles, Star, CheckCircle2, Loader2, MessageSquare } from 'lucide-react'
 import { Job, Farmer } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 

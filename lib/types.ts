@@ -1,6 +1,6 @@
 // User roles
 export type UserRole = 'farmer' | 'worker' | 'admin'
-export type JobStatus = 'posted' | 'in_progress' | 'completed' | 'cancelled'
+export type JobStatus = 'open' | 'in_progress' | 'completed' | 'cancelled'
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
 export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded'
 
