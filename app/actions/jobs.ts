@@ -31,7 +31,7 @@ export async function createJob(data: {
     .from('farmers')
     .select('id')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!farmer) return { error: 'Farmer profile not found' }
 
@@ -118,7 +118,7 @@ export async function getFarmerJobs() {
     .from('farmers')
     .select('id')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!farmer) return { error: 'Farmer profile not found' }
 
@@ -146,15 +146,27 @@ export async function applyToJob(jobId: string) {
     .from('workers')
     .select('id')
     .eq('user_id', user.id)
-    .single()
+    .maybeSingle()
 
   if (!worker) return { error: 'Worker profile not found' }
+
+  // Check if already applied
+  const { data: existingApplication } = await supabase
+    .from('applications')
+    .select('id')
+    .eq('worker_id', worker.id)
+    .eq('job_id', jobId)
+    .maybeSingle()
+
+  if (existingApplication) {
+    return { error: 'Already applied' }
+  }
 
   // Generate unique worker code for anonymous attendance
   const worker_code = 'WRK-' + Math.random().toString(36).substring(2, 6).toUpperCase()
 
   const { data: application, error } = await supabase
-    .from('applications')  // fixed: was job_applications
+    .from('applications')
     .insert({
       job_id: jobId,
       worker_id: worker.id,
@@ -164,11 +176,10 @@ export async function applyToJob(jobId: string) {
     .select()
     .single()
 
-
   if (error) return { error: error.message }
 
   revalidatePath('/worker/applications')
-  return { application }
+  return { application, worker_code }
 }
 
 export async function updateJobStatus(
@@ -186,4 +197,4 @@ export async function updateJobStatus(
 
   revalidatePath('/farmer/dashboard')
   return { success: true }
-}
+}
