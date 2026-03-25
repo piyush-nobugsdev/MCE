@@ -135,7 +135,7 @@ export default function FarmerProfilePage() {
                      </div>
                      <div className="space-y-1.5">
                         <p className="text-xs font-bold text-gray-300 uppercase">Farm Name</p>
-                        <p className="text-xl font-bold text-gray-900">{profile.farm_name}</p>
+                         <p className="text-xl font-bold text-gray-900">{profile.village}</p>
                      </div>
                      <div className="md:col-span-2 space-y-1.5">
                         <p className="text-xs font-bold text-gray-300 uppercase">Full Address</p>

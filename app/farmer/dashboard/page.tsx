@@ -63,7 +63,7 @@ export default function FarmerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Welcome back, <span className="text-green-600">{farmer.first_name}!</span>
+            Welcome back, <span className="text-green-600">{farmer.full_name}!</span>
           </h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">Manage your farm and help workers find jobs</p>
         </div>

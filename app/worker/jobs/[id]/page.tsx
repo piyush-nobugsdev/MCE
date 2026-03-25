@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { applyToJob } from '@/app/actions/jobs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { WorkerNavbar } from '../../components/navbar'
+import { WorkerNavbar } from '@/app/worker/components/navbar'
 import { toast } from 'sonner'
-import { MapPin, IndianRupee, Users, Calendar, ChevronLeft, Sparkles, Star, CheckCircle2, Loader2, MessageSquare } from 'lucide-react'
-import { Job, Farmer } from '@/lib/types'
+import { MapPin, IndianRupee, Users, Calendar, ChevronLeft, ChevronRight, Sparkles, Star, CheckCircle2, Loader2, MessageSquare } from 'lucide-react'
+import { Job, Farmer, GPSLocation } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 
 export default function JobDetailPage() {
@@ -26,60 +26,68 @@ export default function JobDetailPage() {
   const [hasApplied, setHasApplied] = useState(false)
 
   useEffect(() => {
+    let isMounted = true
     const fetchData = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!isMounted) return
 
-      // Fetch job details
-      const { data: jobData } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('id', jobId)
-        .single()
-
-      if (jobData) {
-        setJob(jobData)
-        // Fetch farmer details
-        const { data: farmerData } = await supabase
-          .from('farmers')
+        // Fetch job details
+        const { data: jobData } = await supabase
+          .from('jobs')
           .select('*')
-          .eq('id', jobData.farmer_id)
-          .single()
-        if (farmerData) setFarmer(farmerData)
+          .eq('id', jobId)
+          .maybeSingle()
 
-        // Check if already applied
-        if (user) {
-          const { data: worker } = await supabase
-            .from('workers')
-            .select('id')
-            .eq('user_id', user.id)
-            .single()
+        if (jobData && isMounted) {
+          setJob(jobData)
+          // Fetch farmer details
+          const { data: farmerData } = await supabase
+            .from('farmers')
+            .select('*')
+            .eq('id', jobData.farmer_id)
+            .maybeSingle()
+          if (farmerData && isMounted) setFarmer(farmerData)
 
-          if (worker) {
-            const { data: application } = await supabase
-              .from('applications')
+          // Check if already applied
+          if (user && isMounted) {
+            const { data: worker } = await supabase
+              .from('workers')
               .select('id')
-              .eq('worker_id', worker.id)
-              .eq('job_id', jobId)
-              .single()
-            if (application) setHasApplied(true)
+              .eq('user_id', user.id)
+              .maybeSingle()
+
+            if (worker && isMounted) {
+              const { data: application } = await supabase
+                .from('applications')
+                .select('id')
+                .eq('worker_id', worker.id)
+                .eq('job_id', jobId)
+                .maybeSingle()
+              if (application && isMounted) setHasApplied(true)
+            }
           }
         }
+      } catch (err) {
+        console.error('Fetch error:', err)
+      } finally {
+        if (isMounted) setLoading(false)
       }
-      setLoading(false)
     }
     fetchData()
+    return () => { isMounted = false }
   }, [jobId])
 
   const handleApply = async (e: React.FormEvent) => {
     e.preventDefault()
     setApplying(true)
-    const result = await applyToJob(jobId)
+    const result = await applyToJob(jobId, message)
     if (result.error) {
       toast.error(result.error)
       setApplying(false)
     } else {
-      toast.success('Wait for farmer to accept!')
+      toast.success(`Applied successfully! Your code is ${result.worker_code} — save this for attendance`)
       setHasApplied(true)
       setApplying(false)
     }
@@ -132,7 +140,7 @@ export default function JobDetailPage() {
                <div className="space-y-2">
                   <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Duration</p>
                   <p className="text-3xl font-black text-gray-900 flex items-center gap-1 uppercase">
-                    {Math.ceil((new Date(job.end_date).getTime() - new Date(job.start_date).getTime()) / (1000 * 3600 * 24))} Days
+                    {job.date_range ? Math.ceil((new Date(job.date_range.end_date).getTime() - new Date(job.date_range.start_date).getTime()) / (1000 * 3600 * 24)) : 0} Days
                   </p>
                </div>
                <div className="space-y-2 hidden md:block">
@@ -177,7 +185,7 @@ export default function JobDetailPage() {
                        <div className="px-4 py-2 bg-white rounded-xl text-yellow-600 font-black text-lg flex items-center gap-2 shadow-sm">
                          <Star className="w-5 h-5 fill-yellow-500" /> {farmer.rating.toFixed(1)}
                        </div>
-                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{farmer.farm_name}</p>
+                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{farmer.village}</p>
                     </div>
                  </div>
               </Card>
