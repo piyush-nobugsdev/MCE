@@ -26,7 +26,7 @@ export default function WorkerDashboard() {
       } = await supabase.auth.getUser()
 
       if (!user) {
-        window.location.href = '/auth/phone'
+        window.location.href = '/auth/role-selection'
         return
       }
 
@@ -96,7 +96,7 @@ export default function WorkerDashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome, {worker.name}!
+            Welcome, {worker.full_name}!
           </h1>
           <p className="text-gray-600">Find and apply for farm jobs in your area</p>
         </div>
@@ -177,7 +177,7 @@ export default function WorkerDashboard() {
                           {typeof job.location === 'string' ? job.location : job.location?.name || 'Unknown location'}
                         </p>
                         <p className="text-sm text-blue-600 font-medium mt-1">
-                          ${job.wage_amount}/day
+                          ₹{job.wage_amount}/day
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
