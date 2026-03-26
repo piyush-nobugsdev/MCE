@@ -38,9 +38,10 @@ export interface Farmer {
   user_id: string;
   first_name: string;
   last_name: string;
-  village: string;
-  district: string;
-  state: string;
+  village: string | null;
+  district: string | null;
+  state: string | null;
+  farm_location: GPSLocation | null;
   rating: number;
   total_jobs_posted: number;
   created_at: string;

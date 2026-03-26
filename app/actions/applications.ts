@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { notifyWorkerHired } from '@/lib/services/sms'
 
 // Haversine formula to calculate distance between two points
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -157,6 +158,29 @@ export async function updateApplicationStatus(applicationId: string, status: 'ac
 
   // If accepting, check if job is now full and close it
   if (status === 'accepted') {
+      // Fetch details for SMS notification
+      const { data: details } = await supabase
+        .from('applications')
+        .select(`
+          jobs(title, farmers(first_name, last_name, users(phone))),
+          workers(first_name, users(phone))
+        `)
+        .eq('id', applicationId)
+        .maybeSingle()
+
+      if (details) {
+        const workerPhone = (details.workers as any)?.users?.phone
+        const farmerPhone = (details.jobs as any)?.farmers?.users?.phone
+        const workerName = (details.workers as any)?.first_name
+        const jobTitle = (details.jobs as any)?.title
+
+        if (workerPhone && farmerPhone) {
+          // Send SMS asynchronously - don't block the UI
+          notifyWorkerHired(workerPhone, workerName, jobTitle, farmerPhone)
+            .catch(err => console.error('Delayed SMS error:', err))
+        }
+      }
+
       const { data: jobData } = await supabase
         .from('jobs')
         .select('id, workers_needed')

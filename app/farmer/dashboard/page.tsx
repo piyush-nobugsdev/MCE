@@ -93,7 +93,10 @@ export default function FarmerDashboard() {
 
           {/* Sidebar Area (4/12) */}
           <div className="lg:col-span-4 space-y-8">
-            <WeatherWidget lat={0} lng={0} />
+            <WeatherWidget 
+              lat={farmer.farm_location?.lat || 0} 
+              lng={farmer.farm_location?.lng || 0} 
+            />
             
             <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-6">
                <div className="flex items-center justify-between border-b border-gray-50 pb-4">
