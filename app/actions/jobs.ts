@@ -108,6 +108,32 @@ export async function getJobs(filters?: {
   return { jobs: data }
 }
 
+export async function getJobDetails(jobId: string) {
+  const supabase = await createClient()
+
+  const { data: job, error: jobError } = await supabase
+    .from('jobs')
+    .select(`
+      *,
+      farmers (
+        id,
+        first_name,
+        last_name,
+        village,
+        district,
+        state,
+        rating
+      )
+    `)
+    .eq('id', jobId)
+    .maybeSingle()
+
+  if (jobError) return { error: jobError.message }
+  if (!job) return { error: 'Job not found' }
+
+  return { job }
+}
+
 export async function getFarmerJobs() {
   const supabase = await createClient()
 

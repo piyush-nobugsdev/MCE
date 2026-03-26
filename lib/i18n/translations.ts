@@ -13,6 +13,8 @@ export const translations = {
     cancel: 'CANCEL',
     loading: 'LOADING...',
     add_new: 'ADD NEW',
+    samman_kendra: 'SAMMAN KENDRA',
+    sahyog_kendra: 'SAHYOG KENDRA',
     
     // Role Selection
     select_role: 'CHOOSE YOUR ROLE TO GET STARTED',
@@ -66,6 +68,88 @@ export const translations = {
     yes: 'YES',
     no: 'NO',
     sign_out: 'SIGN OUT',
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'SIGN IN',
+    home_title: 'Fair work, fair pay',
+    home_subtitle: 'A marketplace connecting farmers and workers directly. Post jobs, find work, earn fairly.',
+    get_started: 'GET STARTED',
+    learn_more: 'LEARN MORE',
+    
+    // Features
+    feature_1_title: 'Farmer & Worker Community',
+    feature_1_desc: 'Direct connections between farmers and workers. Build lasting relationships and grow together without intermediaries.',
+    feature_2_title: 'Fair Wages, Full Transparency',
+    feature_2_desc: 'See wages upfront, no hidden fees. Workers know exactly what they\'ll earn. Farmers post honest rates.',
+    feature_3_title: 'Speak Your Language',
+    feature_3_desc: 'Support for English, Hindi, and Kannada. Connect and communicate in the language you\'re most comfortable with.',
+    feature_4_title: 'Preview Before You Commit',
+    feature_4_desc: 'Farmers preview applications. Workers preview jobs. Make informed decisions with full transparency.',
+    
+    // How it works
+    how_it_works: 'How it works',
+    for_farmers: 'For Farmers',
+    for_workers: 'For Workers',
+    farmer_step_1: 'Create your profile',
+    farmer_step_2: 'Post a job',
+    farmer_step_3: 'Review applications',
+    farmer_step_4: 'Hire and manage',
+    farmer_step_5: 'Process payments',
+    
+    worker_step_1: 'Create your profile',
+    worker_step_2: 'Browse nearby jobs',
+    worker_step_3: 'Apply to work',
+    worker_step_4: 'Get hired',
+    worker_step_5: 'Get paid',
+
+    ready_to_start: "Ready to get started?",
+    signup_cta: "Join thousands of farmers and workers who are building better opportunities.",
+    footer_tagline: "Modernizing agriculture, one connection at a time.",
+
+    // Dashboard
+    dashboard: 'Dashboard',
+    loading_profile: 'Loading Profile...',
+    profile_not_found: 'Profile not found. Please log in again.',
+    welcome_back: 'Welcome back',
+    upcoming_schedule: 'Upcoming Schedule',
+    no_activities_today: 'No activities scheduled for today',
+
+    // Applications
+    no_applications: 'No applications received yet',
+    apply_prompt: 'Post a job to start seeing applicants',
+
+    // Payments
+    payment_history: 'Payment History',
+    payment_history_desc: 'Record of completed and pending payments for workers.',
+    direct_payment_policy: 'Direct Payment Policy',
+    signout_failed: 'Failed to sign out',
+    hello: 'Hello',
+    find_best_jobs: 'Find the best farm jobs near you',
+    your_applications: 'Your Applications',
+    see_all: 'See All',
+    job_completed: 'Job Completed',
+    pay_rate: 'Pay Rate',
+    available: 'Available',
+    daily_pay: 'Daily Pay',
+    searching_jobs: 'Searching for new jobs...',
+    rate_farmer: 'Rate Farmer',
+    feedback: 'Feedback',
+    cancel: 'Cancel',
+    submit_rating: 'Submit Rating',
+    searching_jobs: 'Searching for new jobs...',
+    rate_farmer: 'Rate Farmer',
+    feedback_label: 'Feedback',
+    select_feedback: 'Select feedback...',
+    rating_in_progress: 'Rating...',
+    loading_applications: 'Loading Applications...',
+    no_applications: 'No applications received yet',
+    apply_prompt: 'Post a job to start seeing applicants',
+    worker_name: 'Worker Name',
+    job_active_status: 'Job active. Rating unlocks after completion.',
+    no_skills_listed: 'No skills listed',
+    applications: 'Worker Applications',
+    applications_subtitle: 'Review anonymous applications and hire the best workers',
   },
   hi: {
     // Shared
@@ -79,6 +163,8 @@ export const translations = {
     cancel: 'रद्द करें',
     loading: 'लोड हो रहा है...',
     add_new: 'नया जोड़ें',
+    samman_kendra: 'सम्मान केंद्र',
+    sahyog_kendra: 'सहयोग केंद्र',
 
     // Role Selection
     select_role: 'शुरू करने के लिए अपनी भूमिका चुनें',
@@ -132,6 +218,88 @@ export const translations = {
     yes: 'हाँ',
     no: 'नहीं',
     sign_out: 'लॉग आउट',
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'लॉग इन करें',
+    home_title: 'निष्पक्ष काम, निष्पक्ष वेतन',
+    home_subtitle: 'किसान और श्रमिकों को सीधे जोड़ने वाला एक बाज़ार। काम पोस्ट करें, काम खोजें, निष्पक्ष रूप से कमाएं।',
+    get_started: 'शुरुआत करें',
+    learn_more: 'और जानें',
+    
+    // Features
+    feature_1_title: 'किसान और श्रमिक समुदाय',
+    feature_1_desc: 'किसान और श्रमिकों के बीच सीधा संपर्क। बिना बिचौलियों के संबंध बनाएं और साथ बढ़ें।',
+    feature_2_title: 'निष्पक्ष मजदूरी, पूरी पारदर्शिता',
+    feature_2_desc: 'मजदूरी पहले से देखें, कोई छिपी फीस नहीं। श्रमिकों को पता है कि उन्हें क्या मिलेगा। किसान ईमानदार दरें पोस्ट करते हैं।',
+    feature_3_title: 'अपनी भाषा में बात करें',
+    feature_3_desc: 'अंग्रेजी, हिंदी और कन्नड़ के लिए समर्थन। उस भाषा में जुड़ें जिसमें आप सबसे ज्यादा सहज हैं।',
+    feature_4_title: 'प्रतिबद्ध होने से पहले देखें',
+    feature_4_desc: 'किसान आवेदन देख सकते हैं। श्रमिक नौकरियां देख सकते हैं। पूरी पारदर्शिता के साथ सूचित निर्णय लें।',
+    
+    // How it works
+    how_it_works: 'यह कैसे काम करता है',
+    for_farmers: 'किसानों के लिए',
+    for_workers: 'श्रमिकों के लिए',
+    farmer_step_1: 'अपनी प्रोफाइल बनाएं',
+    farmer_step_2: 'एक काम पोस्ट करें',
+    farmer_step_3: 'आवेदनों की समीक्षा करें',
+    farmer_step_4: 'काम पर रखें और प्रबंधित करें',
+    farmer_step_5: 'भुगतान प्रक्रिया करें',
+    
+    worker_step_1: 'अपनी प्रोफाइल बनाएं',
+    worker_step_2: 'पास के काम ब्राउज़ करें',
+    worker_step_3: 'काम के लिए आवेदन करें',
+    worker_step_4: 'काम पर लगाया जाएं',
+    worker_step_5: 'भुगतान प्राप्त करें',
+
+    ready_to_start: "शुरुआत करने के लिए तैयार हैं?",
+    signup_cta: "हजारों किसानों और श्रमिकों में शामिल हों जो बेहतर अवसर बना रहे हैं।",
+    footer_tagline: "कृषि को आधुनिक बनाना, एक कनेक्शन एक समय में।",
+
+    // Dashboard
+    dashboard: 'डैशबोर्ड',
+    loading_profile: 'प्रोफ़ाइल लोड हो रही है...',
+    profile_not_found: 'प्रोफ़ाइल नहीं मिली। कृपया फिर से लॉगिन करें।',
+    welcome_back: 'वापस स्वागत है',
+    upcoming_schedule: 'आगामी कार्यक्रम',
+    no_activities_today: 'आज के लिए कोई गतिविधियां शेड्यूल नहीं हैं',
+
+    // Applications
+    no_applications: 'अभी तक कोई आवेदन प्राप्त नहीं हुए',
+    apply_prompt: 'आवेदकों को देखने के लिए एक काम पोस्ट करें',
+
+    // Payments
+    payment_history: 'भुगतान इतिहास',
+    payment_history_desc: 'किसानों के लिए पूरा और लंबित भुगतान का रिकॉर्ड।',
+    direct_payment_policy: 'प्रत्यक्ष भुगतान नीति',
+    signout_failed: 'लॉग आउट असफल हुआ',
+    hello: 'नमस्ते',
+    find_best_jobs: 'अपने पास के सर्वोत्तम खेत के काम खोजें',
+    your_applications: 'आपके आवेदन',
+    see_all: 'सभी देखें',
+    job_completed: 'काम पूरा हुआ',
+    pay_rate: 'भुगतान दर',
+    available: 'उपलब्ध',
+    daily_pay: 'दैनिक भुगतान',
+    searching_jobs: 'नए काम खोज रहे हैं...',
+    rate_farmer: 'किसान को रेट करें',
+    feedback: 'प्रतिक्रिया',
+    cancel: 'रद्द करें',
+    submit_rating: 'रेटिंग जमा करें',
+    searching_jobs: 'नए काम खोजे जा रहे हैं...',
+    rate_farmer: 'किसान को रेट करें',
+    feedback_label: 'प्रतिक्रिया',
+    select_feedback: 'प्रतिक्रिया चुनें...',
+    rating_in_progress: 'रेटिंग...',
+    loading_applications: 'आवेदन लोड हो रहे हैं...',
+    no_applications: 'अभी तक कोई आवेदन प्राप्त नहीं हुए',
+    apply_prompt: 'आवेदकों को देखने के लिए एक काम पोस्ट करें',
+    worker_name: 'कर्मचारी का नाम',
+    job_active_status: 'काम सक्रिय है। पूरा होने के बाद रेटिंग अनलॉक होती है।',
+    no_skills_listed: 'कोई कौशल सूचीबद्ध नहीं',
+    applications: 'कर्मचारी आवेदन',
+    applications_subtitle: 'गुमनाम आवेदन की समीक्षा करें और सर्वश्रेष्ठ श्रमिकों को नियुक्त करें',
   },
   kn: {
     // Shared
@@ -145,6 +313,8 @@ export const translations = {
     cancel: 'ರದ್ದುಮಾಡಿ',
     loading: 'ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
     add_new: 'ಹೊಸ ಸೇರಿಸಿ',
+    samman_kendra: 'ಸಮ್ಮಾನ್ ಕೇಂದ್ರ',
+    sahyog_kendra: 'ಸಹಯೋಗ ಕೇಂದ್ರ',
 
     // Role Selection
     select_role: 'ಪ್ರಾರಂಭಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
@@ -198,5 +368,86 @@ export const translations = {
     yes: 'ಹೌದು',
     no: 'ಇಲ್ಲ',
     sign_out: 'ಲಾಗ್ ಔಟ್',
-  }
+
+    // Homepage
+    farmwork: 'FarmWork',
+    sign_in: 'ಲಾಗಿನ್ ಮಾಡಿ',
+    home_title: 'ನ್ಯಾಯಸಮ್ಮತ ಕೆಲಸ, ನ್ಯಾಯಸಮ್ಮತ ವೇತನ',
+    home_subtitle: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರನ್ನು ನೇರವಾಗಿ ಸಂಪರ್ಕಿಸುವ ಮಾರುಕಟ್ಟೆ. ಕೆಲಸ ಪೋಸ್ಟ್ ಮಾಡಿ, ಕೆಲಸ ಹುಡುಕಿ, ನ್ಯಾಯಸಮ್ಮತವಾಗಿ ಗಳಿಸಿ.',
+    get_started: 'ಪ್ರಾರಂಭಿಸಿ',
+    learn_more: 'ಹೆಚ್ಚಿನ ಮಾಹಿತಿ',
+    
+    // Features
+    feature_1_title: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕ ಸಮುದಾಯ',
+    feature_1_desc: 'ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರ ನಡುವಿನ ನೇರ ಸಂಪರ್ಕ. ಮಧ್ಯವರ್ತಿಗಳಿಲ್ಲದೆ ಸಂಬಂಧ ನಿರ್ಮಿಸಿ ಮತ್ತು ಒಟ್ಟಿಗೆ ಬೆಳೆದುಕೊಳ್ಳಿ.',
+    feature_2_title: 'ನ್ಯಾಯೋಚಿತ ವೇತನ, ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕತೆ',
+    feature_2_desc: 'ವೇತನವನ್ನು ಮುಂಚಿತವಾಗಿ ನೋಡಿ, ಯಾವುದೇ ಲುಕ್ಕಾ ಶುಲ್ಕ ಇಲ್ಲ. ಕಾರ್ಮಿಕರಿಗೆ ತಿಳಿದಿದೆ ಅವರು ಏನು ಅರ್ಜಿ ಮಾಡಿದ್ದಾರೆ. ರೈತರು ಸಾಧುವಾದ ದರಗಳನ್ನು ಪೋಸ್ಟ್ ಮಾಡುತ್ತಾರೆ.',
+    feature_3_title: 'ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಮಾತನಾಡಿ',
+    feature_3_desc: 'ಇಂಗ್ಲಿಷ್, ಹಿಂದಿ ಮತ್ತು ಕನ್ನಡ ಬೆಂಬಲ. ನೀವು ಸುಖದಿಂದ ಭಾಷೆಯಲ್ಲಿ ಸಂಪರ್ಕ ಸಾಧಿಸಿ ಮತ್ತು ಸಂವಹನ ಮಾಡಿ.',
+    feature_4_title: 'ಪ್ರತಿಶ್ರುತಿ ಮುಂಚೆ ನೋಡಿ',
+    feature_4_desc: 'ರೈತರು ಅರ್ಜಿ ನೋಡಿಕೊಳ್ಳಬಹುದು. ಕಾರ್ಮಿಕರು ಕೆಲಸ ನೋಡಿಕೊಳ್ಳಬಹುದು. ಸಂಪೂರ್ಣ ಪಾರದರ್ಶಕತೆ ಹೊಂದಿ ತಿಳಿತ ನಿರ್ಧಾರ ತೆಗೆದುಕೊಳ್ಳಿ.',
+    
+    // How it works
+    how_it_works: 'ಇದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ',
+    for_farmers: 'ರೈತರಿಗೆ',
+    for_workers: 'ಕಾರ್ಮಿಕರಿಗೆ',
+    farmer_step_1: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ',
+    farmer_step_2: 'ಕೆಲಸ ಪೋಸ್ಟ್ ಮಾಡಿ',
+    farmer_step_3: 'ಅರ್ಜಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ',
+    farmer_step_4: 'ನೇಮಿಸಿ ಮತ್ತು ನಿರ್ವಹಿಸಿ',
+    farmer_step_5: 'ಭುಗತನ ಪ್ರಕ್ರಿಯೆ ಮಾಡಿ',
+    
+    worker_step_1: 'ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ರಚಿಸಿ',
+    worker_step_2: 'ಹತ್ತಿರದ ಕೆಲಸಗಳನ್ನು ಬ್ರೌಸ್ ಮಾಡಿ',
+    worker_step_3: 'ಕೆಲಸಕ್ಕೆ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ',
+    worker_step_4: 'ನೇಮಿಸಲಾ',
+    worker_step_5: 'ಭುಗತನ ಪಡೆಯಿರಿ',
+
+    ready_to_start: "ಪ್ರಾರಂಭಿಸಲು ಸಿದ್ಧರಾ?",
+    signup_cta: "ಸಾವಿರಾರು ರೈತ ಮತ್ತು ಕಾರ್ಮಿಕರಲ್ಲಿ ಸೇರಿ ಬೇಹುದು ಅವಕಾಶ ನಿರ್ಮಾಣ ಮಾಡುತ್ತಾರೆ.",
+    footer_tagline: "ಕೃಷಿಕ ಕಾರ್ಯಕ್ಷಮತೆಯನ್ನು ಆಧುನೀಕರಿಸಲಾಗುತ್ತಿದೆ, ಒಂದೇ ಸಂಪರ್ಕ ಒಂದು ಸಮಯದಲ್ಲಿ.",
+
+    // Dashboard
+    dashboard: 'ಡ್ಯಾಶ್‌ಬೋರ್ಡ್',
+    loading_profile: 'ಪ್ರೊಫೈಲ್ ಲೋಡ್ ಆಗುತ್ತಿದೆ...',
+    profile_not_found: 'ಪ್ರೊಫೈಲ್ ಕಂಡುಬಂದಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಲಾಗಿನ್ ಮಾಡಿ.',
+    welcome_back: 'ಮರುಸ್ವಾಗತ',
+    upcoming_schedule: 'ಮುಂದಿನ ಕಾರ್ಯಕ್ರಮ',
+    no_activities_today: 'ಈಗಗಿನ ಅವಧಿಗೆ ಯಾವುದೇ ಚಟುವಟಿಕೆಗಳು ನಿರ্ধಾರಿಸಲಾಗಿಲ್ಲ',
+
+    // Applications
+    no_applications: 'ಇನ್ನೂ ಯಾವುದೇ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಲಭ್ಯವಿಲ್ಲ',
+    apply_prompt: 'ಅರ್ಜಿ ಸಲ್ಲಿಸಿದವರನ್ನು ನೋಡಲು ಕೆಲಸವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿ',
+
+    // Payments
+    payment_history: 'ಪಾವತಿ ಇತಿಹಾಸ',
+    payment_history_desc: 'ಶ್ರಮಿಕರ ಪೂರ್ಣಗೊಂಡ ಮತ್ತು ನಿರೀಕ್ಷಿತ ಪಾವತಿಗಳ ದಾಖಲೆ.',
+    direct_payment_policy: 'ನೇರ ಪಾವತಿ ನೀತಿ',
+    hello: 'ನಮಸ್ಕಾರ',
+    find_best_jobs: 'ನಿಮ್ಮ ಹತ್ತಿರದ ಅತ್ಯುತ್ತಮ фермы ಕೆಲಸವನ್ನು ಹುಡುಕಿ',
+    your_applications: 'ನಿಮ್ಮ ಅರ್ಜಿಗಳು',
+    see_all: 'ಎಲ್ಲವನ್ನು ನೋಡಿ',
+    job_completed: 'ಕೆಲಸ ಪೂರ್ಣವಾಗಿದೆ',
+    pay_rate: 'ಪಾವತಿ ದರ',
+    available: 'ಲಭ್ಯವಿದೆ',
+    daily_pay: 'ದೈನಂದಿನ ಪಾವತಿ',
+    searching_jobs: 'ಹೊಸ ಉದ್ಯೋಗಗಳನ್ನು ಹುಡುಕಲಾಗುತ್ತಿದೆ...',
+    rate_farmer: 'ರೈತನ್ನು ರೇಟು ಮಾಡಿ',
+    feedback: 'ಪ್ರತಿಕ್ರಿಯೆ',
+    cancel: 'ರದ್ದುಮಾಡಿ',
+    submit_rating: 'ರೇಟಿಂಗ್ ಸಲ್ಲಿಸಿ',
+    searching_jobs: 'ಹೊಸ ಉದ್ಯೋಗಗಳು ಹುಡುಕಲಾಗುತ್ತಿದೆ...',
+    rate_farmer: 'ರೈತನ್ನು ರೇಟು ಮಾಡಿ',
+    feedback_label: 'ಪ್ರತಿಕ್ರಿಯೆ',
+    select_feedback: 'ಪ್ರತಿಕ್ರಿಯೆಯನ್ನು ಆರಿಸಿ...',
+    rating_in_progress: 'ರೇಟಿಂಗ್...',
+    loading_applications: 'ಅರ್ಜಿಗಳನ್ನು ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...',
+    no_applications: 'ಇನ್ನೂ ಯಾವುದೇ ಅರ್ಜಿಗಳು ಲಭ್ಯವಿಲ್ಲ',
+    apply_prompt: 'ಅರ್ಜಿದಾರರನ್ನು ನೋಡಲು ಕೆಲಸವನ್ನು ಪೋಸ್ಟ್ ಮಾಡಿ',
+    worker_name: 'ಕಾರ್ಮಿಕನ ಹೆಸರು',
+    job_active_status: 'ಕೆಲಸ ಸಕ್ರಿಯವಾಗಿದೆ. ಪೂರ್ಣಗೊಳ್ಳುವಾಗ ರೇಟಿಂಗ್ ಅನ್ಲಾಕ್ ಆಗುತ್ತದೆ.',
+    no_skills_listed: 'ಯಾವುದೇ ಕೌಶಲ್ಯಗಳು ಪಟ್ಟಿಮಾಡಲಾಗಿಲ್ಲ',
+    applications: 'ಕಾರ್ಮಿಕ ಅರ್ಜಿಗಳು',
+    applications_subtitle: 'ಗೋಪ್ಯ ಅರ್ಜಿಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ಅತ್ಯುತ್ತಮ ಕಾರ್ಮಿಕರನ್ನು ನೇಮಿಸಿ',
+  },
 }

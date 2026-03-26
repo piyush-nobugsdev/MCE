@@ -86,7 +86,7 @@ export default function ApplicationsPage() {
     return acc
   }, {} as Record<string, ApplicationWithDetails[]>)
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen font-bold text-gray-400">Loading Applications...</div>
+  if (loading) return <div className="flex items-center justify-center min-h-screen font-bold text-gray-400">{t('loading_applications')}</div>
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-20">
@@ -94,9 +94,11 @@ export default function ApplicationsPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 leading-tight">Worker Applications</h1>
+          <h1 className="text-4xl font-bold text-gray-900 leading-tight">
+            {t('applications')}
+          </h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">
-            Review anonymous applications, hire the best workers, and confirm job completion
+            {t('applications_subtitle')}
           </p>
         </div>
 
@@ -105,8 +107,8 @@ export default function ApplicationsPage() {
             <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Clock className="w-10 h-10 text-gray-200" />
             </div>
-            <p className="text-xl font-bold text-gray-400">No applications received yet</p>
-            <p className="text-sm text-gray-300 mt-2 font-medium">Post a job to start seeing applicants</p>
+            <p className="text-xl font-bold text-gray-400">{t('no_applications')}</p>
+            <p className="text-sm text-gray-300 mt-2 font-medium">{t('apply_prompt')}</p>
           </div>
         ) : (
           <div className="space-y-12">

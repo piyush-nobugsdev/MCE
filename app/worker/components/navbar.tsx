@@ -39,7 +39,7 @@ export function WorkerNavbar() {
           <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-md shadow-blue-100 group-hover:-rotate-6 transition-transform">
             <span className="text-white font-bold text-lg">W</span>
           </div>
-          <span className="text-xl font-bold text-gray-900">Smart Resource</span>
+          <span className="text-xl font-bold text-gray-900 tracking-tight">FarmWorks</span>
         </Link>
 
         {/* Desktop Nav */}

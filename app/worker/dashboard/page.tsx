@@ -6,11 +6,13 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { Briefcase, Star, IndianRupee, ChevronRight, Search, DollarSign, CheckCheck, MessageSquare, Quote } from 'lucide-react'
+import { Briefcase, Star, IndianRupee, ChevronRight, Search, DollarSign, CheckCheck } from 'lucide-react'
 import { Worker, Job, WorkerApplicationDetails } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { getWorkerApplications, markCompletion } from '@/app/actions/applications'
 import { getReceivedReviews, getRatingSummary } from '@/app/actions/ratings'
+import { getJobs } from '@/app/actions/jobs'
+import { findWorkerByUserId } from '@/lib/api/worker'
 import { toast } from 'sonner'
 import { RatingModal } from '@/components/rating-modal'
 
@@ -31,11 +33,7 @@ export default function WorkerDashboard() {
   const supabaseRef = { current: createClient() }
 
   const fetchWorkerProfile = useCallback(async (userId: string) => {
-    const { data } = await supabaseRef.current
-      .from('workers')
-      .select('*')
-      .eq('user_id', userId)
-      .single()
+    const data = await findWorkerByUserId(userId)
     if (data) setWorker(data)
   }, [])
 
@@ -59,14 +57,14 @@ export default function WorkerDashboard() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { window.location.href = '/auth/role-selection'; return }
 
-      const { data: workerData } = await supabase
-        .from('workers').select('*').eq('user_id', user.id).single()
+      const workerData = await findWorkerByUserId(user.id)
 
       if (workerData) {
         setWorker(workerData)
-        const { data: jobsData } = await supabase
-          .from('jobs').select('*').eq('status', 'open').order('created_at', { ascending: false })
-        if (jobsData) setJobs(jobsData)
+        
+        // Fetch open jobs using server action
+        const jobsResult = await getJobs({ status: 'open' })
+        if (jobsResult.jobs) setJobs(jobsResult.jobs)
         
         await Promise.all([
           refreshApplications(),
@@ -76,7 +74,7 @@ export default function WorkerDashboard() {
       setLoading(false)
     }
     fetchData()
-  }, [])
+  }, [refreshApplications, refreshReviews])
 
   const handleMarkComplete = async (applicationId: string) => {
     setCompletingId(applicationId)
@@ -104,10 +102,11 @@ export default function WorkerDashboard() {
     toast.success('Your rating has been submitted successfully!')
   }
 
-  if (loading) return <div className="p-10 text-center text-gray-400 font-bold">Loading...</div>
+  if (loading) return <div className="p-10 text-center text-gray-400 font-bold">{t('loading_profile')}</div>
+
   if (!worker) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <p className="text-red-500 font-bold">Profile not found. Please log in again.</p>
+      <p className="text-red-500 font-bold">{t('profile_not_found')}</p>
     </div>
   )
 
@@ -118,9 +117,9 @@ export default function WorkerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Hello, <span className="text-blue-600">{worker.first_name}!</span>
+            {t('hello')}, <span className="text-blue-600">{worker.first_name}!</span>
           </h1>
-          <p className="text-lg text-gray-500 mt-1 font-medium italic">Find the best farm jobs near you</p>
+          <p className="text-lg text-gray-500 mt-1 font-medium italic">{t('find_best_jobs')}</p>
         </div>
 
         {/* Stats */}
@@ -179,7 +178,7 @@ export default function WorkerDashboard() {
           </Link>
         </div>
 
-        {/* Recent Reviews - NEW! */}
+        {/* Recent Reviews */}
         {reviews.length > 0 && (
           <div className="mb-16 space-y-6">
             <div className="flex items-center justify-between px-2">
@@ -206,13 +205,13 @@ export default function WorkerDashboard() {
                       </p>
                     )}
                     {review.tags && review.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {review.tags.map((tag: string) => (
-                            <span key={tag} className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-lg">
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                      <div className="flex flex-wrap gap-2">
+                        {review.tags.map((tag: string) => (
+                          <span key={tag} className="px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-black uppercase rounded-lg">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </CardContent>
                 </Card>
@@ -221,12 +220,12 @@ export default function WorkerDashboard() {
           </div>
         )}
 
-        {/* Applications */}
+        {/* Recent Applications */}
         {applications.length > 0 && (
           <div className="space-y-6 mb-16">
             <div className="flex items-center justify-between px-2">
-              <h2 className="text-2xl font-bold text-gray-900">Your Recent Applications</h2>
-              <Link href="/worker/applications" className="text-sm font-bold text-blue-600 hover:underline">See All</Link>
+              <h2 className="text-2xl font-bold text-gray-900">{t('your_applications')}</h2>
+              <Link href="/worker/applications" className="text-sm font-bold text-blue-600 hover:underline">{t('see_all')}</Link>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -245,7 +244,7 @@ export default function WorkerDashboard() {
                           app.status === 'pending' ? 'bg-yellow-50 text-yellow-700' :
                           'bg-red-50 text-red-700'
                         }`}>
-                          {isFullyCompleted ? '✓ Completed' :
+                          {isFullyCompleted ? '✓ ' + t('job_completed') :
                            farmerConfirmed ? '👆 Farmer Confirmed' :
                            app.status}
                         </span>
@@ -254,13 +253,16 @@ export default function WorkerDashboard() {
                             Code: {app.farmer_code}
                           </span>
                         )}
+                        {app.status !== 'accepted' && (
+                          <span className="text-xs font-bold text-gray-400">📍 {typeof app.job_location === 'string' ? app.job_location : app.job_location?.name}</span>
+                        )}
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">{app.job_title}</h3>
                     </div>
 
                     <div className="flex items-center gap-4 flex-wrap">
                       <div className="text-right">
-                        <p className="text-xs font-bold text-gray-400 mb-0.5">Pay Rate</p>
+                        <p className="text-xs font-bold text-gray-400 mb-0.5">{t('pay_rate')}</p>
                         <p className="text-lg font-bold text-green-600 flex items-center gap-1">
                           <IndianRupee className="w-4 h-4" /> {app.job_wage}
                         </p>
@@ -301,12 +303,12 @@ export default function WorkerDashboard() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-2xl font-bold text-gray-900">{t('available_work')}</h2>
-            <Link href="/worker/jobs" className="text-sm font-bold text-blue-600 hover:underline">See All</Link>
+            <Link href="/worker/jobs" className="text-sm font-bold text-blue-600 hover:underline">{t('see_all')}</Link>
           </div>
 
           {jobs.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center">
-              <p className="text-gray-300 font-bold">Searching for new jobs...</p>
+              <p className="text-gray-300 font-bold">{t('searching_jobs')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
@@ -315,14 +317,14 @@ export default function WorkerDashboard() {
                   <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-blue-200 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">Available</span>
+                        <span className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">{t('available')}</span>
                         <span className="text-xs font-bold text-gray-400">📍 {typeof job.location === 'string' ? job.location : job.location?.name}</span>
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
                     </div>
                     <div className="flex items-center justify-between md:justify-end gap-10">
                       <div className="text-right">
-                        <p className="text-xs font-bold text-gray-400 mb-0.5">Daily Pay</p>
+                        <p className="text-xs font-bold text-gray-400 mb-0.5">{t('daily_pay')}</p>
                         <p className="text-lg font-bold text-green-600 flex items-center gap-1">
                           <IndianRupee className="w-4 h-4" /> {job.wage_amount}
                         </p>

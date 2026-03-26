@@ -1,99 +1,142 @@
+'use client'
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Briefcase, Users, MapPin, DollarSign, CheckCircle, Shield } from 'lucide-react'
+import { Users, IndianRupee, Globe, Eye, Leaf } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/context'
+import { Language } from '@/lib/i18n/translations'
 
 export default function Home() {
+  const { t, language, setLanguage } = useLanguage()
+
+  const languages: { code: Language; label: string }[] = [
+    { code: 'en', label: 'English' },
+    { code: 'hi', label: 'हिंदी' },
+    { code: 'kn', label: 'ಕನ್ನಡ' },
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+    <div className="min-h-screen bg-white">
+      {/* Header with Language Toggle - Enhanced Colors */}
+      <header className="border-b-2 border-green-200 bg-white">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold text-green-600">FarmWork</div>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-500 rounded-lg flex items-center justify-center">
+              <Leaf className="w-5 h-5 text-white" />
+            </div>
+            <div className="text-xl font-bold bg-gradient-to-r from-green-600 to-amber-500 bg-clip-text text-transparent">{t('farmwork')}</div>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex gap-2">
+              {languages.map((lang) => (
+                <button
+                  key={lang.code}
+                  onClick={() => setLanguage(lang.code)}
+                  className={`px-3 py-1.5 rounded text-xs font-medium transition-all ${
+                    language === lang.code 
+                      ? 'bg-green-600 text-white' 
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {lang.label}
+                </button>
+              ))}
+            </div>
             <Link href="/auth/role-selection">
-              <Button variant="outline">Sign In</Button>
+              <Button variant="outline" size="sm" className="border-green-600 text-green-600 hover:bg-green-50">{t('sign_in')}</Button>
             </Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 py-16 md:py-24">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Connect Farmers with Workers
+      {/* Hero Section - Enhanced with Gradient Background */}
+      <section className="max-w-7xl mx-auto px-4 py-20 bg-gradient-to-b from-green-50 to-white">
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            {t('home_title')}
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Farm Work Marketplace makes it easy for farmers to post jobs and for workers to find
-            opportunities. Manage jobs, track attendance, and handle payments all in one place.
+          <p className="text-xl text-gray-700 mb-10">
+            {t('home_subtitle')}
           </p>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/auth/role-selection">
-              <Button size="lg" className="bg-green-600 hover:bg-green-700 w-full sm:w-auto">
-                Get Started
+              <Button size="lg" className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white w-full sm:w-auto">
+                {t('get_started')}
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="w-full sm:w-auto">
-              Learn More
+            <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 w-full sm:w-auto">
+              {t('learn_more')}
             </Button>
           </div>
         </div>
 
-        {/* Features Grid */}
-        <div className="grid md:grid-cols-3 gap-8 my-16">
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <div className="bg-green-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-              <Briefcase className="w-6 h-6 text-green-600" />
+        {/* Features Grid - 4 Features with Vibrant Colors */}
+        <div className="grid md:grid-cols-2 gap-6 mb-20">
+          {/* Feature 1: Community */}
+          <div className="border-2 border-amber-200 bg-amber-50 p-8 rounded-xl hover:shadow-lg transition-shadow">
+            <div className="w-14 h-14 bg-amber-400 rounded-lg flex items-center justify-center mb-6">
+              <Users className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Post & Manage Jobs</h3>
-            <p className="text-gray-600">
-              Farmers can easily post jobs, set wages, and manage applications from qualified
-              workers.
+            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('feature_1_title')}</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {t('feature_1_desc')}
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <div className="bg-blue-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-              <Users className="w-6 h-6 text-blue-600" />
+          {/* Feature 2: Fair Wages */}
+          <div className="border-2 border-green-200 bg-green-50 p-8 rounded-xl hover:shadow-lg transition-shadow">
+            <div className="w-14 h-14 bg-green-600 rounded-lg flex items-center justify-center mb-6">
+              <IndianRupee className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Find Opportunities</h3>
-            <p className="text-gray-600">
-              Workers can browse available jobs, apply directly, and track their applications
-              status.
+            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('feature_2_title')}</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {t('feature_2_desc')}
             </p>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
-            <div className="bg-yellow-100 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-              <DollarSign className="w-6 h-6 text-yellow-600" />
+          {/* Feature 3: Multilingual */}
+          <div className="border-2 border-blue-200 bg-blue-50 p-8 rounded-xl hover:shadow-lg transition-shadow">
+            <div className="w-14 h-14 bg-blue-500 rounded-lg flex items-center justify-center mb-6">
+              <Globe className="w-7 h-7 text-white" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Handle Payments</h3>
-            <p className="text-gray-600">
-              Track attendance, manage payments, and keep records organized in one secure
-              platform.
+            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('feature_3_title')}</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {t('feature_3_desc')}
+            </p>
+          </div>
+
+          {/* Feature 4: Transparency */}
+          <div className="border-2 border-orange-200 bg-orange-50 p-8 rounded-xl hover:shadow-lg transition-shadow">
+            <div className="w-14 h-14 bg-orange-500 rounded-lg flex items-center justify-center mb-6">
+              <Eye className="w-7 h-7 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">{t('feature_4_title')}</h3>
+            <p className="text-gray-700 leading-relaxed">
+              {t('feature_4_desc')}
             </p>
           </div>
         </div>
 
         {/* How It Works */}
-        <div className="bg-white rounded-lg p-12 shadow-sm border border-gray-200 mb-16">
-          <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
+        <div className="mb-20">
+          <h2 className="text-4xl font-bold text-gray-900 text-center mb-16">
+            {t('how_it_works')}
+          </h2>
 
           <div className="grid md:grid-cols-2 gap-12">
-            {/* Farmer Side */}
-            <div>
-              <h3 className="text-2xl font-bold text-green-600 mb-6">For Farmers</h3>
-              <div className="space-y-4">
+            {/* Farmer Side - Green */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 p-10 rounded-xl">
+              <h3 className="text-2xl font-bold text-green-900 mb-8">{t('for_farmers')}</h3>
+              <div className="space-y-5">
                 {[
-                  'Sign up and create your farm profile',
-                  'Post job openings with details and wage',
-                  'Review worker applications',
-                  'Track worker attendance',
-                  'Process payments securely',
+                  t('farmer_step_1'),
+                  t('farmer_step_2'),
+                  t('farmer_step_3'),
+                  t('farmer_step_4'),
+                  t('farmer_step_5'),
                 ].map((step, idx) => (
-                  <div key={idx} className="flex gap-4">
-                    <div className="bg-green-100 text-green-600 rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                  <div key={idx} className="flex gap-4 items-start">
+                    <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {idx + 1}
                     </div>
                     <p className="text-gray-700 pt-1">{step}</p>
@@ -102,19 +145,19 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Worker Side */}
-            <div>
-              <h3 className="text-2xl font-bold text-blue-600 mb-6">For Workers</h3>
-              <div className="space-y-4">
+            {/* Worker Side - Blue */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 p-10 rounded-xl">
+              <h3 className="text-2xl font-bold text-blue-900 mb-8">{t('for_workers')}</h3>
+              <div className="space-y-5">
                 {[
-                  'Sign up with your profile information',
-                  'Browse jobs in your location',
-                  'Apply to opportunities you like',
-                  'Track application status',
-                  'Get paid for completed work',
+                  t('worker_step_1'),
+                  t('worker_step_2'),
+                  t('worker_step_3'),
+                  t('worker_step_4'),
+                  t('worker_step_5'),
                 ].map((step, idx) => (
-                  <div key={idx} className="flex gap-4">
-                    <div className="bg-blue-100 text-blue-600 rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                  <div key={idx} className="flex gap-4 items-start">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold flex-shrink-0">
                       {idx + 1}
                     </div>
                     <p className="text-gray-700 pt-1">{step}</p>
@@ -125,119 +168,62 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Choose FarmWork?</h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {[
-              {
-                icon: MapPin,
-                title: 'Location-Based',
-                description: 'Find jobs near you using GPS or location search',
-              },
-              {
-                icon: CheckCircle,
-                title: 'Easy Tracking',
-                description: 'Track attendance and payment status in real-time',
-              },
-              {
-                icon: Shield,
-                title: 'Secure Platform',
-                description: 'Your data is protected with enterprise-grade security',
-              },
-              {
-                icon: DollarSign,
-                title: 'Fair Pricing',
-                description: 'Transparent wage information for all jobs',
-              },
-            ].map((feature, idx) => {
-              const Icon = feature.icon
-              return (
-                <div key={idx} className="flex gap-4">
-                  <Icon className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
-                    <p className="text-gray-600">{feature.description}</p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-green-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-lg mb-8 opacity-90">
-            Join thousands of farmers and workers using FarmWork to connect and grow their
-            businesses.
+        {/* CTA Section */}
+        <div className="bg-gradient-to-r from-green-500 via-amber-400 to-orange-500 p-12 rounded-xl text-white text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            {t('ready_to_start')}
+          </h2>
+          <p className="text-lg mb-10 max-w-2xl mx-auto opacity-95">
+            {t('signup_cta')}
           </p>
           <Link href="/auth/role-selection">
-            <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100">
-              Sign Up Now
+            <Button size="lg" className="bg-white text-green-600 hover:bg-gray-100 font-semibold">
+              {t('get_started')}
             </Button>
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
+      <footer className="border-t-2 border-green-200 bg-gradient-to-b from-gray-50 to-white py-12 mt-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
-              <h3 className="text-white font-bold mb-4">FarmWork</h3>
-              <p className="text-sm">Connecting farmers and workers for agricultural success.</p>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-br from-green-600 to-green-500 rounded flex items-center justify-center">
+                  <Leaf className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="font-bold text-gray-900">{t('farmwork')}</h3>
+              </div>
+              <p className="text-sm text-gray-600">Connecting farmers and workers directly for fair work and fair pay.</p>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">For Farmers</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Post a Job
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Find Workers
-                  </a>
-                </li>
+              <h4 className="font-semibold text-gray-900 mb-4">{t('for_farmers')}</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><a href="#" className="hover:text-green-600 transition">Post a Job</a></li>
+                <li><a href="#" className="hover:text-green-600 transition">Find Workers</a></li>
+                <li><a href="#" className="hover:text-green-600 transition">Manage Jobs</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">For Workers</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Find Jobs
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Track Earnings
-                  </a>
-                </li>
+              <h4 className="font-semibold text-gray-900 mb-4">{t('for_workers')}</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><a href="#" className="hover:text-blue-600 transition">Find Jobs</a></li>
+                <li><a href="#" className="hover:text-blue-600 transition">Track Earnings</a></li>
+                <li><a href="#" className="hover:text-blue-600 transition">Applications</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Privacy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Terms
-                  </a>
-                </li>
+              <h4 className="font-semibold text-gray-900 mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li><a href="#" className="hover:text-gray-900 transition">Privacy</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition">Terms</a></li>
+                <li><a href="#" className="hover:text-gray-900 transition">Contact</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-700 pt-8 text-center text-sm">
-            <p>&copy; 2026 FarmWork. All rights reserved.</p>
+          <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-600">
+            <p>&copy; 2026 {t('farmwork')}. {t('footer_tagline')}</p>
           </div>
         </div>
       </footer>
