@@ -1,38 +1,53 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { sendOTP, verifyOTP } from '@/lib/services/sms'
 
 export async function signUpWithPhone(phone: string) {
-  const supabase = await createClient()
-
-  const { error } = await supabase.auth.signInWithOtp({
-    phone,
-  })
-
-  if (error) {
-    return { error: error.message }
+  const result = await sendOTP(phone)
+  if (!result.success) {
+    return { error: result.error }
   }
-
   return { success: true }
 }
 
 export async function verifyOtp(phone: string, token: string) {
-  const supabase = await createClient()
+  const result = await verifyOTP(phone, token)
+  if (!result.success) {
+    return { error: result.error }
+  }
 
-  const { error } = await supabase.auth.verifyOtp({
-    phone,
-    token,
-    type: 'sms',
-  })
+  // If verified by Twilio, we need to ensure the user exists in Supabase.
+  const adminClient = createAdminClient()
+  
+  // Clean phone for Supabase (E.164 format)
+  const cleanedPhone = phone.replace(/\D/g, '')
+  const formattedPhone = cleanedPhone.length === 10 ? `+91${cleanedPhone}` : `+${cleanedPhone}`
 
-  if (error) {
-    return { error: error.message }
+  // 1. Check if user exists using admin client
+  const { data: users, error: findError } = await adminClient.auth.admin.listUsers()
+  let user = users?.users.find(u => u.phone === formattedPhone || u.user_metadata?.phone === formattedPhone)
+
+  // 2. If user doesn't exist, create them
+  if (!user) {
+    const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
+      phone: formattedPhone,
+      phone_confirm: true, // Already verified by Twilio
+      user_metadata: { phone: formattedPhone }
+    })
+    
+    if (createError) {
+      console.error('Error creating user:', createError)
+      return { error: 'Failed to create user session' }
+    }
+    user = newUser.user
   }
 
   revalidatePath('/', 'layout')
-  return { success: true }
+  return { success: true, userExists: !!user }
 }
 export async function signUpAsRole(
   role: 'farmer' | 'worker',
@@ -66,13 +81,13 @@ export async function signUpAsRole(
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
       last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
-      village: data.village,
-      district: data.district,
-      state: data.state,
-      farm_location: {
+      village: data.village || null,
+      district: data.district || null,
+      state: data.state || null,
+      farm_location: data.latitude && data.longitude ? {
         lat: parseFloat(data.latitude),
         lng: parseFloat(data.longitude),
-      },
+      } : null,
     }, { onConflict: 'user_id' })
 
     if (error) {
@@ -84,13 +99,13 @@ export async function signUpAsRole(
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
       last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
-      village: data.village,
-      district: data.district,
-      state: data.state,
-      home_location: {
+      village: data.village || null,
+      district: data.district || null,
+      state: data.state || null,
+      home_location: data.latitude && data.longitude ? {
         lat: parseFloat(data.latitude),
         lng: parseFloat(data.longitude),
-      },
+      } : null,
       age: data.age ? parseInt(data.age) : null,
       experience: data.experience ? parseInt(data.experience) : null,
       skills: data.skills?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],

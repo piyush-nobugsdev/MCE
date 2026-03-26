@@ -38,9 +38,10 @@ export interface Farmer {
   user_id: string;
   first_name: string;
   last_name: string;
-  village: string;
-  district: string;
-  state: string;
+  village: string | null;
+  district: string | null;
+  state: string | null;
+  farm_location?: GPSLocation | null;
   rating: number;
   total_jobs_posted: number;
   created_at: string;
@@ -54,9 +55,9 @@ export interface Worker {
   last_name: string;
   age?: number | null;
   experience?: number | null;
-  village: string;
-  district: string;
-  state: string;
+  village: string | null;
+  district: string | null;
+  state: string | null;
   home_location: GPSLocation | null;
   skills: string[];
   travel_distance_preference: number | null;

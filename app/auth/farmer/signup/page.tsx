@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { signUpAsRole } from '@/app/actions/auth'
+import { signUpAsRole, signUpWithPhone, verifyOtp } from '@/app/actions/auth'
 import { toast } from 'sonner'
 import { Loader2, MapPin, Phone, CheckCircle2, XCircle, Sprout } from 'lucide-react'
 
@@ -20,55 +20,49 @@ export default function FarmerSignupPage() {
     lastName: '',
     mobile: '+91 ',
     otp: '',
-    village: '',
-    district: '',
-    state: '',
-    latitude: '',
-    longitude: '',
   })
 
   const set = (field: string, val: string) =>
     setForm(prev => ({ ...prev, [field]: val }))
 
   const normalizePhone = (m: string) => {
-    const clean = m.replace(/\s+/g, '')
-    return clean.startsWith('+') ? clean : `+91${clean}`
+    return m.replace(/\s+/g, '')
   }
 
   const handleSendOtp = async () => {
-    if (!form.mobile.trim()) return toast.error('Enter your mobile number')
+    const cleanPhone = normalizePhone(form.mobile)
+    if (cleanPhone.length < 13) return toast.error('Enter a valid mobile number')
+    
     setSendingOtp(true)
-    await new Promise(r => setTimeout(r, 800))
+    const result = await signUpWithPhone(cleanPhone)
     setSendingOtp(false)
-    setOtpStatus('sent')
-    toast.success('OTP sent! (use 123456 for testing)')
+
+    if (result.error) {
+      toast.error(result.error)
+    } else {
+      setOtpStatus('sent')
+      toast.success('Verification code sent')
+    }
   }
 
   const handleVerifyOtp = async () => {
     if (!form.otp.trim()) return toast.error('Enter the OTP')
+    
     setOtpStatus('verifying')
-    await new Promise(r => setTimeout(r, 600))
-    if (form.otp !== '123456') {
+    const cleanPhone = normalizePhone(form.mobile)
+    const result = await verifyOtp(cleanPhone, form.otp)
+
+    if (result.error) {
       setOtpStatus('failed')
       setOtpPopup('fail')
+      toast.error(result.error)
       setTimeout(() => setOtpPopup(null), 3000)
     } else {
       setOtpStatus('verified')
       setOtpPopup('success')
+      toast.success('Phone verified!')
       setTimeout(() => setOtpPopup(null), 3000)
     }
-  }
-
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) return toast.error('Geolocation not supported')
-    navigator.geolocation.getCurrentPosition(
-      pos => {
-        set('latitude', pos.coords.latitude.toFixed(6))
-        set('longitude', pos.coords.longitude.toFixed(6))
-        toast.success('Location captured!')
-      },
-      () => toast.error('Could not get location')
-    )
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -80,11 +74,6 @@ export default function FarmerSignupPage() {
       firstName: form.firstName,
       lastName: form.lastName,
       mobile: normalizePhone(form.mobile),
-      village: form.village,
-      district: form.district,
-      state: form.state,
-      latitude: form.latitude || '0',
-      longitude: form.longitude || '0',
     })
     if (result?.error) {
       toast.error(result.error)
@@ -209,46 +198,6 @@ export default function FarmerSignupPage() {
               <CheckCircle2 className="w-4 h-4" /> Phone verified!
             </div>
           )}
-
-          {/* Location Area */}
-          <div className="space-y-4 pt-4 border-t border-gray-50">
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-gray-700 text-center block">Farm Address</label>
-              <input
-                type="text"
-                placeholder="Village Name"
-                value={form.village}
-                onChange={e => set('village', e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-100 rounded-xl text-lg font-bold focus:outline-none focus:ring-4 focus:ring-green-50 transition"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="District"
-                value={form.district}
-                onChange={e => set('district', e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-green-50 transition"
-              />
-              <input
-                type="text"
-                placeholder="State"
-                value={form.state}
-                onChange={e => set('state', e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-100 rounded-xl font-bold focus:outline-none focus:ring-4 focus:ring-green-50 transition"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={handleGetLocation}
-              className="w-full py-3 border border-green-200 text-green-700 bg-green-50 hover:bg-green-100 font-bold rounded-xl text-sm transition flex items-center justify-center gap-2"
-            >
-              <MapPin className="w-4 h-4" /> Auto-detect Location
-            </button>
-          </div>
 
           {/* Submit */}
           <form onSubmit={handleSubmit} className="pt-6">
