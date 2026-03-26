@@ -9,8 +9,6 @@ import { Phone, Loader2, Sprout } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { useLanguage } from '@/lib/i18n/context'
 
-import { signUpWithPhone, verifyOtp } from '@/app/actions/auth'
-
 export default function FarmerLoginPage() {
   const router = useRouter()
   const { t } = useLanguage()
@@ -27,35 +25,23 @@ export default function FarmerLoginPage() {
   }
 
   const handleSendOtp = async () => {
-    const cleanPhone = mobile.replace(/\s+/g, '')
-    if (cleanPhone.length < 13) return toast.error('Please enter a valid mobile number')
-    
+    if (mobile.length < 14) return toast.error('Please enter a valid mobile number')
     setSendingOtp(true)
-    const result = await signUpWithPhone(cleanPhone)
+    await new Promise(r => setTimeout(r, 1000))
     setSendingOtp(false)
-
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      setOtpSent(true)
-      toast.success('Verification code sent to your mobile')
-    }
+    setOtpSent(true)
+    toast.success('OTP sent! Use 123456 for testing.')
   }
 
   const handleLogin = async () => {
     if (otp.length !== 6) return toast.error('Please enter 6-digit OTP')
-    
     setVerifying(true)
-    const cleanPhone = mobile.replace(/\s+/g, '')
-    const result = await verifyOtp(cleanPhone, otp)
-    setVerifying(false)
-
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      toast.success('Verified successfully')
-      router.push('/farmer/dashboard')
+    await new Promise(r => setTimeout(r, 800))
+    if (otp !== '123456') {
+      setVerifying(false)
+      return toast.error('Invalid OTP. Use 123456.')
     }
+    router.push('/farmer/dashboard')
   }
 
   const handleGoogle = async () => {

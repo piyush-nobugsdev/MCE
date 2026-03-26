@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS farmers (
 
   full_name VARCHAR(255) GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED,
 
-  village VARCHAR(255),
-  district VARCHAR(255),
-  state VARCHAR(255),
+  village VARCHAR(255) NOT NULL,
+  district VARCHAR(255) NOT NULL,
+  state VARCHAR(255) NOT NULL,
 
   farm_location JSONB,
 
@@ -55,9 +55,9 @@ CREATE TABLE IF NOT EXISTS workers (
   age INTEGER,
   experience INTEGER,
 
-  village VARCHAR(255),
-  district VARCHAR(255),
-  state VARCHAR(255),
+  village VARCHAR(255) NOT NULL,
+  district VARCHAR(255) NOT NULL,
+  state VARCHAR(255) NOT NULL,
 
   home_location JSONB,
 
@@ -259,9 +259,6 @@ CREATE TABLE IF NOT EXISTS replies (
 --------------------------------------------------
 -- INDEXES
 --------------------------------------------------
-
--- Add phone column to users if not exists (already in initial setup but for clarity)
--- ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20) UNIQUE;
 
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_tag ON posts(tag);

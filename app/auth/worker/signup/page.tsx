@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import { signUpAsRole, signUpWithPhone, verifyOtp } from '@/app/actions/auth'
+import { signUpAsRole } from '@/app/actions/auth'
 import { toast } from 'sonner'
 import { Loader2, MapPin, Phone, CheckCircle2, XCircle, HardHat } from 'lucide-react'
 
@@ -35,41 +35,30 @@ export default function WorkerSignupPage() {
     setForm(prev => ({ ...prev, [field]: val }))
 
   const normalizePhone = (m: string) => {
-    return m.replace(/\s+/g, '')
+    const clean = m.replace(/\s+/g, '')
+    return clean.startsWith('+') ? clean : `+91${clean}`
   }
 
   const handleSendOtp = async () => {
-    const cleanPhone = normalizePhone(form.mobile)
-    if (cleanPhone.length < 13) return toast.error('Enter a valid mobile number')
-    
+    if (!form.mobile.trim()) return toast.error('Enter your mobile number')
     setSendingOtp(true)
-    const result = await signUpWithPhone(cleanPhone)
+    await new Promise(r => setTimeout(r, 800))
     setSendingOtp(false)
-
-    if (result.error) {
-      toast.error(result.error)
-    } else {
-      setOtpStatus('sent')
-      toast.success('Verification code sent')
-    }
+    setOtpStatus('sent')
+    toast.success('OTP sent! (use 123456 for testing)')
   }
 
   const handleVerifyOtp = async () => {
     if (!form.otp.trim()) return toast.error('Enter the OTP')
-    
     setOtpStatus('verifying')
-    const cleanPhone = normalizePhone(form.mobile)
-    const result = await verifyOtp(cleanPhone, form.otp)
-
-    if (result.error) {
+    await new Promise(r => setTimeout(r, 600))
+    if (form.otp !== '123456') {
       setOtpStatus('failed')
       setOtpPopup('fail')
-      toast.error(result.error)
       setTimeout(() => setOtpPopup(null), 3000)
     } else {
       setOtpStatus('verified')
       setOtpPopup('success')
-      toast.success('Phone verified!')
       setTimeout(() => setOtpPopup(null), 3000)
     }
   }

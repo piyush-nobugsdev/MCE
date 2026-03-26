@@ -8,10 +8,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { FarmerNavbar } from '../../components/navbar'
 import { toast } from 'sonner'
 import Link from 'next/link'
-import { MapPin, Calendar, Users, Briefcase, IndianRupee, ChevronLeft, Loader2, Sparkles, Plus, History, ChevronDown, CheckCircle2 } from 'lucide-react'
+import { MapPin, Calendar, Users, Briefcase, IndianRupee, ChevronLeft, Loader2, Sparkles, Plus, History, ChevronDown, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/context'
 import { getFarms } from '@/app/actions/farms'
 import { FarmForm } from '@/components/farm-form'
+import { VoiceJobButton } from '@/components/VoiceJobButton'
 
 export default function NewJobPage() {
   const router = useRouter()
@@ -35,6 +36,50 @@ export default function NewJobPage() {
   
   const [farms, setFarms] = useState<any[]>([])
   const [selectedFarm, setSelectedFarm] = useState<string>('')
+  const [missingFields, setMissingFields] = useState<string[]>([])
+
+  const handleVoicePrefill = (data: any) => {
+    setFormData(prev => ({
+      ...prev,
+      title: data.title || prev.title,
+      description: data.description ? (prev.description + '\n' + data.description) : prev.description,
+      wage_amount: data.budget?.toString() || prev.wage_amount,
+    }))
+  }
+
+  useEffect(() => {
+    fetchFarms()
+    
+    // Check for AI prefilled data
+    const prefilled = sessionStorage.getItem('prefilledJob')
+    if (prefilled) {
+      try {
+        const data = JSON.parse(prefilled)
+        setFormData(prev => ({
+          ...prev,
+          title: data.title || prev.title,
+          description: (data.description || '') + (data.requirements ? '\n\nRequirements: ' + data.requirements : ''),
+          wage_amount: data.budget?.toString() || prev.wage_amount,
+        }))
+        sessionStorage.removeItem('prefilledJob')
+        toast.success('AI extracted some job details for you!')
+      } catch (e) {
+        console.error('Failed to parse prefilled job data')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (formData.title || formData.description) {
+        // Validation for missing fields
+        const missing = []
+        if (!formData.title) missing.push('title')
+        if (!formData.description) missing.push('description')
+        if (!selectedFarm) missing.push('location')
+        if (!formData.wage_amount || formData.wage_amount === '0') missing.push('wage')
+        setMissingFields(missing)
+    }
+  }, [formData, selectedFarm])
 
   const fetchFarms = async () => {
     const { farms } = await getFarms()
@@ -129,6 +174,24 @@ export default function NewJobPage() {
              <Sparkles className="w-5 h-5 text-yellow-500" /> Let workers find your farm
           </p>
         </div>
+
+        {missingFields.length > 0 && (
+          <div className="mb-8 p-8 bg-blue-50/50 border-2 border-dashed border-blue-200 rounded-[2.5rem] animate-in slide-in-from-top-4">
+             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="space-y-1">
+                   <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5" /> Some details are missing
+                   </h3>
+                   <p className="text-sm font-medium text-blue-600/80">
+                      You can type them below or use voice to fill: <span className="font-black underline">{missingFields.join(', ')}</span>
+                   </p>
+                </div>
+                <div className="w-full md:w-auto">
+                    <VoiceJobButton label="Fill with Voice" onExtracted={handleVoicePrefill} />
+                </div>
+             </div>
+          </div>
+        )}
 
         <Card className="border-none shadow-xl shadow-gray-100/50 rounded-[40px] overflow-hidden bg-white">
           <CardContent className="p-8 md:p-12">

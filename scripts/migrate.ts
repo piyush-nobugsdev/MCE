@@ -16,23 +16,30 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-async function runMigration() {
+async function runMigration(filename: string) {
   try {
-    const sqlPath = path.join(__dirname, '../supabase/migrations/001_ratings.sql')
+    const sqlPath = path.join(__dirname, '../supabase/migrations', filename)
     const sql = fs.readFileSync(sqlPath, 'utf8')
-    
-    // Note: This relies on the exec_sql RPC function existing in Supabase.
-    // An alternative is using supersonic if it's not setup.
     const { error } = await supabase.rpc('exec_sql', { sql })
-    
     if (error) {
-       console.error('Migration failed:', error.message)
+      console.error(`Migration ${filename} failed:`, error.message)
     } else {
-       console.log('Migration successful')
+      console.log(`Migration ${filename} successful`)
     }
   } catch (err: any) {
-    console.error('Error reading migration file or executing:', err.message)
+    console.error(`Error running ${filename}:`, err.message)
   }
 }
 
-runMigration()
+async function main() {
+  const target = process.argv[2]
+  if (target) {
+    await runMigration(target)
+  } else {
+    // Run all migrations in order
+    await runMigration('001_ratings.sql')
+    await runMigration('002_completion.sql')
+  }
+}
+
+main()

@@ -1,35 +1,28 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '../components/navbar'
 import Link from 'next/link'
-import { MapPin, IndianRupee, Clock, ChevronRight, Search, Briefcase } from 'lucide-react'
-import { Job } from '@/lib/types'
-import { useLanguage } from '@/lib/i18n/context'
+import { MapPin, IndianRupee, Clock, ChevronRight, Search } from 'lucide-react'
+import { getTranslations } from '@/lib/i18n/server'
+import { redirect } from 'next/navigation'
 
-export default function WorkerJobsPage() {
-  const { t } = useLanguage()
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
+export default async function WorkerJobsPage() {
+  const { t } = await getTranslations()
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/auth/role-selection')
+  }
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      const supabase = createClient()
-      const { data } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('status', 'open')
-        .order('created_at', { ascending: false })
-      if (data) setJobs(data)
-      setLoading(false)
-    }
-    fetchJobs()
-  }, [])
+  const { data: jobs } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('status', 'open')
+    .order('created_at', { ascending: false })
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen font-bold text-gray-400">Finding available work...</div>
+  const availableJobs = jobs || []
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-20">
@@ -50,7 +43,7 @@ export default function WorkerJobsPage() {
           <div className="flex items-center gap-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
              <div className="px-6 text-center border-r border-gray-100">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Total Jobs</p>
-                <p className="text-2xl font-bold text-blue-600">{jobs.length}</p>
+                <p className="text-2xl font-bold text-blue-600">{availableJobs.length}</p>
              </div>
              <div className="px-6 text-center">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
@@ -62,7 +55,7 @@ export default function WorkerJobsPage() {
           </div>
         </div>
 
-        {jobs.length === 0 ? (
+        {availableJobs.length === 0 ? (
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm text-center py-24">
             <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Search className="w-10 h-10 text-gray-200" />
@@ -72,7 +65,7 @@ export default function WorkerJobsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6">
-            {jobs.map((job) => (
+            {availableJobs.map((job) => (
               <Card key={job.id} className="border border-gray-100 shadow-sm rounded-3xl overflow-hidden bg-white hover:border-blue-200 transition-all duration-300">
                 <CardContent className="p-8">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
@@ -115,7 +108,7 @@ export default function WorkerJobsPage() {
 
                     {/* Actions */}
                     <div className="pt-4 md:pt-0 border-t md:border-t-0 md:border-l border-gray-50 md:pl-8">
-                       <Link href={`/worker/jobs/${job.id}`} className="w-full">
+                       <Link href={`/worker/jobs/${job.id}`} className="w-full" prefetch={true}>
                          <Button className="w-full h-16 px-10 bg-black hover:bg-gray-900 text-white rounded-2xl text-lg font-bold flex items-center justify-center gap-3 shadow-md">
                            {t('view_details')} <ChevronRight className="w-5 h-5" />
                          </Button>
@@ -132,4 +125,3 @@ export default function WorkerJobsPage() {
     </div>
   )
 }
-

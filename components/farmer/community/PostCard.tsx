@@ -59,7 +59,7 @@ export function PostCard({ post }: { post: Post }) {
           <div className="bg-red-50/30 p-3.5 rounded-lg flex items-center gap-3 border border-red-100/50">
             <AlertCircle className="w-4 h-4 text-red-500" />
             <p className="text-[10px] font-bold text-red-600 uppercase tracking-wider">
-{(style as any).helpHighlight || 'Immediate assistance requested'}
+              {style.helpHighlight}
             </p>
           </div>
         )}
