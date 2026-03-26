@@ -1,13 +1,13 @@
 'use client'
-
-import { LucideIcon } from 'lucide-react'
+ 
 import { Card, CardContent } from '@/components/ui/card'
+import { type ElementType } from 'react'
 
 interface Props {
   id: string
   title: string
   description: string
-  icon: LucideIcon
+  icon: ElementType
   onClick: () => void
 }
 
