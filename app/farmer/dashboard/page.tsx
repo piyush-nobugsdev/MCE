@@ -58,13 +58,13 @@ async function FarmerDashboardContent() {
         />
         
         <div className="space-y-4">
-           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Services & Management</h2>
-           <QuickActions />
+           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Quick Post by Voice</h2>
+           <VoiceJobButton />
         </div>
 
         <div className="space-y-4">
-           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">AI Assistant</h2>
-           <VoiceJobButton />
+           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Services & Management</h2>
+           <QuickActions />
         </div>
 
         {/* Recent Reviews */}
@@ -140,14 +140,15 @@ async function FarmerDashboardContent() {
     </div>
   )
 }
-
 export default async function FarmerDashboard() {
   const { t } = await getTranslations()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  
-  // We handle auth in middleware or here if needed, but the page shell should render fast
-  
+  if (!user) redirect('/auth/role-selection')
+
+  const farmerData = await findFarmerByUserId(user.id)
+  const welcomeName = farmerData?.first_name || ''
+
   return (
     <div className="min-h-screen bg-gray-50/50 font-sans pb-10">
       <FarmerNavbar />
@@ -157,16 +158,10 @@ export default async function FarmerDashboard() {
         {/* Header Section */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">{t('dashboard')}</h1>
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">{t('welcome_back')}</p>
-          </div>
-          <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-gray-200 shadow-sm">
-             <div className="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                <Plus className="w-5 h-5 text-green-600" />
-             </div>
-             <Link href="/farmer/jobs/new" prefetch={true} className="text-xs font-bold text-gray-900 uppercase tracking-widest pr-4 hover:text-green-600 transition-colors">
-                {t('add_new')}
-             </Link>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+              {t('welcome_back')}{welcomeName ? `, ${welcomeName}` : ''}
+            </h1>
+            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">{t('dashboard')}</p>
           </div>
         </div>
 

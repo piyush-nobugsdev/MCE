@@ -126,11 +126,11 @@ export function VoiceJobButton({ onExtracted, label }: VoiceJobButtonProps) {
             )}
           </div>
           <div className="text-left">
-            <p className="text-xs font-black text-blue-400 mb-0.5 uppercase tracking-widest">
-                {isCapturing ? "Recording..." : "New: AI Job Posting"}
+            <p className="text-xs font-black text-blue-400 mb-0.5 uppercase tracking-widest leading-none">
+                {isCapturing ? "Recording Now..." : "Quick: Post by Speaking"}
             </p>
-            <span className="text-xl font-bold flex items-center gap-2">
-              {label || "Create Job with Voice"} <Sparkles className="w-5 h-5 text-yellow-500" />
+            <span className="text-xl font-bold flex items-center gap-2 text-gray-900 tracking-tight">
+              {label || "Speak to Post Job"} <Sparkles className="w-5 h-5 text-yellow-500" />
             </span>
           </div>
         </div>
