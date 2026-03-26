@@ -17,12 +17,14 @@ const tagStyles = {
   tip: { 
     label: 'Knowledge', 
     icon: Lightbulb, 
-    color: 'bg-green-50 text-green-600 border-green-100'
+    color: 'bg-green-50 text-green-600 border-green-100',
+    helpHighlight: ''
   },
   experience: { 
     label: 'Field Notes', 
     icon: NotebookPen, 
-    color: 'bg-blue-50 text-blue-600 border-blue-100'
+    color: 'bg-blue-50 text-blue-600 border-blue-100',
+    helpHighlight: ''
   }
 }
 
