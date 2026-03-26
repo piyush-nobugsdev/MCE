@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { applyToJob } from '@/app/actions/jobs'
+import { applyToJob, getJobDetails } from '@/app/actions/jobs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { WorkerNavbar } from '@/app/worker/components/navbar'
@@ -33,22 +33,12 @@ export default function JobDetailPage() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!isMounted) return
 
-        // Fetch job details
-        const { data: jobData } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('id', jobId)
-          .maybeSingle()
+        // Fetch job details using server action
+        const result = await getJobDetails(jobId)
 
-        if (jobData && isMounted) {
-          setJob(jobData)
-          // Fetch farmer details
-          const { data: farmerData } = await supabase
-            .from('farmers')
-            .select('*')
-            .eq('id', jobData.farmer_id)
-            .maybeSingle()
-          if (farmerData && isMounted) setFarmer(farmerData)
+        if (result.job && isMounted) {
+          setJob(result.job)
+          if (result.job.farmers) setFarmer(result.job.farmers)
 
           // Check if already applied
           if (user && isMounted) {

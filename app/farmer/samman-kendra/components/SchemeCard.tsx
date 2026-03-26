@@ -10,26 +10,42 @@ interface SchemeCardProps {
 export function SchemeCard({ scheme, onClick }: SchemeCardProps) {
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-50/50 transition-all group border-gray-100 flex h-32 rounded-3xl bg-white/50 backdrop-blur-sm"
+      className="overflow-hidden cursor-pointer hover:border-green-500 shadow-sm hover:shadow-md transition-all group border-gray-200 rounded-xl bg-white flex flex-col"
       onClick={() => onClick(scheme)}
     >
-      <div className="relative w-32 h-full flex-shrink-0 overflow-hidden border-r border-gray-50">
+      <div className="relative w-full h-48 overflow-hidden border-b border-gray-100">
         <Image
           src={scheme.image}
           alt={scheme.name}
           fill
-          className="object-cover group-hover:scale-110 transition-transform duration-700"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+        <div className="absolute top-4 left-4">
+           <span className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-md text-[9px] font-bold text-green-700 uppercase tracking-wider shadow-sm border border-green-100">
+             Government Approved
+           </span>
+        </div>
       </div>
-      <CardContent className="p-4 flex flex-col justify-center min-w-0">
-        <h3 className="text-lg font-black text-gray-900 mb-0.5 truncate leading-tight">{scheme.name}</h3>
-        <p className="text-[10px] font-black text-green-600 uppercase tracking-[0.2em] mb-2">
-          {scheme.benefit}
-        </p>
-        <p className="text-[11px] text-gray-500 font-medium line-clamp-2 leading-tight">
+      <CardContent className="p-5 space-y-4">
+        <div className="space-y-1">
+          <h3 className="text-xl font-bold text-gray-900 leading-tight group-hover:text-green-600 transition-colors">
+            {scheme.name}
+          </h3>
+          <p className="text-[11px] font-bold text-green-600 uppercase tracking-widest">
+            {scheme.benefit}
+          </p>
+        </div>
+        
+        <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2">
           {scheme.description}
         </p>
+
+        <div className="pt-4 flex items-center justify-between border-t border-gray-100">
+           <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">View Details</span>
+           <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-green-600 transition-colors">
+              <span className="text-gray-400 group-hover:text-white text-xs">→</span>
+           </div>
+        </div>
       </CardContent>
     </Card>
   )

@@ -62,7 +62,7 @@ export async function signUpAsRole(
   }
 
   if (role === 'farmer') {
-    const { error } = await supabase.from('farmers').insert({
+    const { error } = await supabase.from('farmers').upsert({
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
       last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
@@ -73,14 +73,14 @@ export async function signUpAsRole(
         lat: parseFloat(data.latitude),
         lng: parseFloat(data.longitude),
       },
-    })
+    }, { onConflict: 'user_id' })
 
     if (error) {
       return { error: error.message }
     }
 
   } else {
-    const { error } = await supabase.from('workers').insert({
+    const { error } = await supabase.from('workers').upsert({
       user_id: user.id,
       first_name: data.firstName?.trim() ?? full_name.split(' ')[0],
       last_name:  (data.lastName?.trim() ?? full_name.split(' ').slice(1).join(' ')) || '',
@@ -95,7 +95,7 @@ export async function signUpAsRole(
       experience: data.experience ? parseInt(data.experience) : null,
       skills: data.skills?.split(',').map((s) => s.trim()).filter(Boolean) ?? [],
       travel_distance_preference: parseInt(data.travel_distance ?? '10'),
-    })
+    }, { onConflict: 'user_id' })
 
     if (error) {
       return { error: error.message }

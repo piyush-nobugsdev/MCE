@@ -122,7 +122,7 @@ export default function RoleSelectionPage() {
           {/* Footer Text */}
           <div className="text-center mt-16">
             <p className="text-gray-500 text-xs uppercase tracking-wider font-semibold">
-              Building Fair Opportunities for All &bull; 2026
+              {t('footer_tagline')} • 2026
             </p>
           </div>
         </div>

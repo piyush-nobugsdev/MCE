@@ -223,7 +223,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-600">
-            <p>&copy; 2026 FarmWork. Modernizing agriculture, one connection at a time.</p>
+            <p>&copy; 2026 {t('farmwork')}. {t('footer_tagline')}</p>
           </div>
         </div>
       </footer>

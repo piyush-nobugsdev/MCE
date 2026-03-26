@@ -231,6 +231,63 @@ CREATE TABLE IF NOT EXISTS notifications (
 );
 
 --------------------------------------------------
+-- POSTS TABLE (Community Feed)
+--------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  tag VARCHAR(50) DEFAULT 'experience',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+--------------------------------------------------
+-- REPLIES TABLE (Post Comments)
+--------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS replies (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+--------------------------------------------------
+-- INDEXES
+--------------------------------------------------
+
+CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
+CREATE INDEX IF NOT EXISTS idx_posts_tag ON posts(tag);
+CREATE INDEX IF NOT EXISTS idx_replies_post_id ON replies(post_id);
+
+--------------------------------------------------
+-- ENABLE RLS
+--------------------------------------------------
+
+ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE replies ENABLE ROW LEVEL SECURITY;
+
+-- Posts: Anyone can read posts
+CREATE POLICY "Anyone can read posts" ON posts
+  FOR SELECT USING (true);
+
+-- Posts: Authenticated users can create posts
+CREATE POLICY "Authenticated users can create posts" ON posts
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Replies: Anyone can read replies
+CREATE POLICY "Anyone can read replies" ON replies
+  FOR SELECT USING (true);
+
+-- Replies: Authenticated users can create replies
+CREATE POLICY "Authenticated users can create replies" ON replies
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+--------------------------------------------------
 -- INDEXES
 --------------------------------------------------
 

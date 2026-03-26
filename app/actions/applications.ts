@@ -173,7 +173,7 @@ export async function updateApplicationStatus(applicationId: string, status: 'ac
       if (acceptedCount !== null && acceptedCount >= jobData.workers_needed) {
         await supabase
           .from('jobs')
-          .update({ status: 'closed' })
+          .update({ status: 'in_progress' })
           .eq('id', jobData.id)
       }
     }

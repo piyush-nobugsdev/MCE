@@ -12,10 +12,10 @@ export function SammanHeader() {
           </div>
           <span className="text-[10px] font-black text-green-600 bg-green-50 px-3 py-1 rounded-full uppercase tracking-widest">Active Schemes</span>
         </div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-none">
+        <h1 className="text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">
           Samman Kendra
         </h1>
-        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-2">Connecting you with government benefits & opportunities</p>
+        <p className="text-gray-400 font-bold text-sm uppercase tracking-widest mt-3 max-w-xl">Connecting you with government benefits, subsidies, and growth opportunities</p>
       </div>
       
       <Link href="/farmer/dashboard">

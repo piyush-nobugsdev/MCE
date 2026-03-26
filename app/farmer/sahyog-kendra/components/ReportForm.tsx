@@ -1,92 +1,84 @@
-import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { FileText, Camera, MessageSquare } from 'lucide-react'
-import { toast } from 'sonner'
+'use client'
 
-interface ReportFormProps {
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Loader2, Send, ShieldCheck } from 'lucide-react'
+
+interface Props {
   categoryTitle: string
-  initialDescription: string
   onSubmit: (aadhaar: string, description: string) => void
   loading: boolean
+  script: string
 }
 
-export function ReportForm({ categoryTitle, initialDescription, onSubmit, loading }: ReportFormProps) {
+export function ReportForm({ categoryTitle, onSubmit, loading, script }: Props) {
   const [aadhaar, setAadhaar] = useState('')
-  const [description, setDescription] = useState(initialDescription)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!aadhaar || aadhaar.length < 12) {
-      return toast.error('Valid 12-digit Aadhaar required for verification')
-    }
-    onSubmit(aadhaar, description)
-  }
+  const [description, setDescription] = useState('')
 
   return (
-    <div className="space-y-10">
-      <div className="space-y-2">
-         <span className="px-4 py-1.5 bg-green-100 text-green-700 text-[10px] font-black uppercase tracking-widest rounded-full">Reporting: {categoryTitle}</span>
-         <h2 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Support Verification Form</h2>
-      </div>
+    <Card className="rounded-[3rem] border-0 shadow-2xl shadow-gray-100/50 overflow-hidden bg-white/90 backdrop-blur-sm animate-in zoom-in-95 duration-500">
+      <CardContent className="p-12 space-y-10">
+        <div className="space-y-3">
+           <h2 className="text-[10px] font-black text-green-600 uppercase tracking-[0.3em] ml-1">Verified Reporting</h2>
+           <h3 className="text-4xl font-black text-gray-900 uppercase tracking-tighter leading-none">{categoryTitle}</h3>
+        </div>
 
-      <Card className="border-0 shadow-2xl shadow-gray-200/50 rounded-[3rem] bg-white overflow-hidden">
-         <CardContent className="p-10 lg:p-12">
-            <form onSubmit={handleSubmit} className="space-y-8">
-               
-               <div className="space-y-3">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Aadhaar Card Number (Verification)</label>
-                  <div className="relative">
-                     <FileText className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300" />
-                     <input 
-                        type="text" 
-                        maxLength={12}
-                        value={aadhaar}
-                        onChange={(e) => setAadhaar(e.target.value.replace(/\D/g, ''))}
-                        placeholder="12-digit number"
-                        className="w-full pl-16 pr-8 py-6 bg-gray-50 rounded-[2rem] text-lg font-bold border-2 border-transparent focus:border-green-400 focus:bg-white transition-all outline-none"
-                        required
-                     />
-                  </div>
-               </div>
+        <div className="bg-blue-50/30 p-8 rounded-[2.5rem] border border-blue-100/50 flex items-start gap-5 relative overflow-hidden">
+           <div className="absolute top-0 right-0 w-20 h-20 bg-blue-100/20 rounded-full -mr-10 -mt-10 blur-xl" />
+           <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-blue-50 shrink-0">
+              <span className="text-xl">🤖</span>
+           </div>
+           <p className="text-[11px] font-bold text-blue-800 leading-relaxed uppercase tracking-[0.15em] mt-1.5 relative z-10">
+             {script}
+           </p>
+        </div>
 
-               <div className="space-y-4">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Upload Proof (Geo-tagged Photos & Documents)</label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                     <button type="button" className="aspect-square bg-gray-50 border-4 border-dashed border-gray-100 rounded-[2rem] flex flex-col items-center justify-center gap-2 hover:bg-green-50 hover:border-green-100 transition-all group">
-                        <Camera className="w-6 h-6 text-gray-300 group-hover:text-green-600" />
-                        <span className="text-[8px] font-black uppercase text-gray-400">Add Proof</span>
-                     </button>
-                     <div className="aspect-square bg-gray-100 rounded-[2rem] relative overflow-hidden flex items-center justify-center">
-                        <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">Awaiting...</span>
-                     </div>
-                  </div>
-                  <p className="text-[10px] font-bold text-gray-400 italic px-2">Photos must be taken via app for GPS metadata. Documents like land records are mandatory.</p>
-               </div>
+        <div className="space-y-8">
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-1">Aadhaar Number</label>
+            <input 
+              type="text" 
+              maxLength={12}
+              value={aadhaar}
+              onChange={(e) => setAadhaar(e.target.value)}
+              placeholder="XXXX XXXX XXXX"
+              className="w-full h-16 px-8 rounded-2xl bg-gray-50/50 border-2 border-transparent focus:border-green-500/10 focus:bg-white focus:ring-4 focus:ring-green-500/5 text-gray-900 font-bold placeholder:text-gray-300 transition-all duration-300"
+            />
+          </div>
 
-               <div className="space-y-3">
-                  <label className="text-xs font-black text-gray-400 uppercase tracking-widest pl-2">Explain the situation</label>
-                  <div className="relative">
-                     <MessageSquare className="absolute left-6 top-6 w-5 h-5 text-gray-300" />
-                     <textarea 
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="w-full pl-16 pr-8 py-6 bg-gray-50 rounded-[2.5rem] min-h-[200px] text-sm font-bold border-2 border-transparent focus:border-green-400 focus:bg-white transition-all outline-none resize-none leading-relaxed"
-                        required
-                     />
-                  </div>
-               </div>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-1">Loss Description</label>
+            <textarea 
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Please provide details about your loss..."
+              className="w-full p-8 rounded-[2rem] bg-gray-50/50 border-2 border-transparent focus:border-green-500/10 focus:bg-white focus:ring-4 focus:ring-green-500/5 text-gray-900 font-bold placeholder:text-gray-300 resize-none transition-all duration-300"
+            />
+          </div>
 
-               <Button 
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-24 bg-green-600 hover:bg-green-700 text-white rounded-[2.5rem] shadow-2xl shadow-green-100 text-xl font-black uppercase tracking-widest transition-all active:scale-95"
-               >
-                  {loading ? 'Transmitting Data...' : 'Submit Support Request'}
-               </Button>
-            </form>
-         </CardContent>
-      </Card>
-    </div>
+          <div className="bg-green-50/50 p-6 rounded-2xl flex items-center gap-5 border border-green-100/50">
+             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                <ShieldCheck className="w-5 h-5 text-green-600" />
+             </div>
+             <p className="text-[10px] font-bold text-green-700 uppercase tracking-[0.15em] opacity-80">Encrypted Submission • Aid Verification Only</p>
+          </div>
+
+          <Button 
+            onClick={() => onSubmit(aadhaar, description)}
+            disabled={loading || !aadhaar || !description}
+            className="w-full h-16 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-black uppercase tracking-widest shadow-2xl shadow-green-100 transition-all active:scale-[0.98] disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+              <div className="flex items-center gap-3">
+                <span className="tracking-widest">Submit Report</span>
+                <Send className="w-5 h-5" />
+              </div>
+            )}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

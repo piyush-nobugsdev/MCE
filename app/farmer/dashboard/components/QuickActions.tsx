@@ -39,30 +39,33 @@ export function QuickActions() {
 
   const getColorClasses = (color: string) => {
     switch (color) {
-      case 'blue': return 'bg-blue-50 text-blue-600 group-hover:bg-blue-600'
-      case 'orange': return 'bg-orange-50 text-orange-600 group-hover:bg-orange-600'
-      case 'green': return 'bg-white/10 text-white'
-      default: return 'bg-gray-50 text-gray-600'
+      case 'blue': return 'bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white'
+      case 'orange': return 'bg-orange-50 text-orange-600 group-hover:bg-orange-600 group-hover:text-white'
+      case 'green': return 'bg-white/20 text-white'
+      default: return 'bg-gray-100 text-gray-500 group-hover:bg-gray-600 group-hover:text-white'
     }
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {actions.map((action) => (
         <Link key={action.href} href={action.href} className="group">
-          <div className={`${action.h} p-5 rounded-2xl border border-gray-200 shadow-sm transition-all flex items-center justify-between ${
-            action.color === 'green' ? 'bg-green-600 hover:bg-green-700 shadow-xl shadow-green-100' : 'bg-white hover:border-gray-400 hover:shadow-xl'
+          <div className={`p-6 rounded-xl border border-gray-200 shadow-sm transition-all h-full flex flex-col justify-between gap-6 ${
+            action.color === 'green' ? 'bg-green-600 hover:bg-green-700 shadow-md shadow-green-100' : 'bg-white hover:border-gray-400 hover:shadow-md'
           }`}>
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${getColorClasses(action.color)}`}>
-                <action.icon className="w-5 h-5 group-hover:text-white transition-colors" />
-              </div>
-              <div>
-                <h3 className={`text-base font-black leading-tight uppercase tracking-tight ${action.color === 'green' ? 'text-white' : 'text-gray-900'}`}>{action.title}</h3>
-                <p className={`${action.color === 'green' ? 'text-green-100/70' : 'text-gray-400'} text-[10px] font-bold uppercase tracking-[0.15em] mt-1`}>{action.subtitle}</p>
-              </div>
+            <div className={`w-12 h-12 rounded-lg flex items-center justify-center transition-all duration-300 ${getColorClasses(action.color)}`}>
+              <action.icon className="w-6 h-6 transition-colors" />
             </div>
-            <ChevronRight className={`w-4 h-4 ${action.color === 'green' ? 'text-white/50' : 'text-gray-300'} group-hover:translate-x-1 transition-transform`} />
+            
+            <div className="space-y-1">
+              <h3 className={`text-sm font-black leading-tight uppercase tracking-widest ${action.color === 'green' ? 'text-white' : 'text-gray-900'}`}>{action.title}</h3>
+              <p className={`${action.color === 'green' ? 'text-green-100/70' : 'text-gray-400'} text-[10px] font-bold uppercase tracking-wider`}>{action.subtitle}</p>
+            </div>
+
+            <div className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${action.color === 'green' ? 'text-white' : 'text-green-600'} opacity-0 group-hover:opacity-100 transition-opacity`}>
+               <span>Open</span>
+               <ChevronRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+            </div>
           </div>
         </Link>
       ))}

@@ -20,34 +20,36 @@ export function RecentJobsList({ jobs }: RecentJobsListProps) {
       </div>
 
       {jobs.length === 0 ? (
-        <div className="bg-white border-2 border-gray-100 border-dashed p-10 rounded-[2rem] text-center">
-           <p className="text-xs font-black text-gray-300 uppercase tracking-widest">No jobs posted yet</p>
+        <div className="bg-white border border-gray-200 border-dashed p-12 rounded-xl text-center">
+           <p className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">No recent jobs found</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 gap-3">
           {jobs.slice(0, 4).map((job) => (
             <Link key={job.id} href={`/farmer/jobs/${job.id}`}>
-              <div className="bg-white p-5 rounded-2xl border border-gray-100 hover:border-gray-200 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 group">
-                <div className="flex items-center gap-4">
-                  <div className={`w-3 h-3 rounded-full ${job.status === 'open' ? 'bg-blue-500 animate-pulse' : 'bg-gray-200'}`} />
+              <div className="bg-white p-6 rounded-xl border border-gray-200 hover:border-gray-400 shadow-sm transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 group">
+                <div className="flex items-center gap-5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${job.status === 'open' ? 'bg-green-500' : 'bg-gray-200'}`} />
                   <div>
-                    <h3 className="text-sm font-black text-gray-900 leading-tight uppercase tracking-tight">{job.title}</h3>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-[9px] font-bold text-gray-400 flex items-center gap-1 uppercase tracking-wider">
+                    <h3 className="text-base font-black text-gray-900 leading-none uppercase tracking-tight mb-1">{job.title}</h3>
+                    <div className="flex items-center gap-4">
+                      <span className="text-[10px] font-bold text-gray-400 flex items-center gap-1.5 uppercase tracking-widest">
                         <MapPin className="w-3 h-3" />
                         {typeof job.location === 'string' ? job.location : job.location?.name}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-3 md:pt-0">
+                <div className="flex items-center justify-between md:justify-end gap-8 border-t md:border-t-0 pt-4 md:pt-0">
                   <div className="text-right">
-                    <p className="text-lg font-black text-gray-900 flex items-center gap-1 justify-end leading-none">
+                    <p className="text-xl font-black text-gray-900 flex items-center gap-1.5 justify-end leading-none">
                       <IndianRupee className="w-4 h-4 text-green-600" /> {job.wage_amount}
                     </p>
-                    <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1">PER DAY</p>
+                    <p className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-1.5">PER DAY • {job.workers_needed} POSITIONS</p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-gray-200 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
+                  <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-green-600 transition-colors">
+                    <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-white transition-all" />
+                  </div>
                 </div>
               </div>
             </Link>

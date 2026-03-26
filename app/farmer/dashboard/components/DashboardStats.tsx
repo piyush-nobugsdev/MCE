@@ -17,19 +17,22 @@ export function DashboardStats({ activeJobs, completedJobs, rating }: DashboardS
   ]
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {stats.map((stat, idx) => (
         <div 
           key={stat.label} 
-          className={`bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:border-gray-200 transition-colors ${idx === 2 ? 'col-span-2 md:col-span-1' : ''}`}
+          className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm transition-all hover:shadow-md hover:border-gray-300 group"
         >
-          <div className="flex items-center gap-2.5 mb-2">
-            <div className="w-7 h-7 bg-gray-50 rounded-lg flex items-center justify-center">
-              <stat.icon className={`w-3.5 h-3.5 ${stat.color}`} />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center group-hover:bg-green-50 transition-colors">
+              <stat.icon className={`w-5 h-5 ${stat.color} transition-colors group-hover:text-green-600`} />
             </div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{stat.label}</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{stat.label}</p>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-3xl font-black text-gray-900 tracking-tight">{stat.value}</p>
+            {idx === 2 && <span className="text-[10px] font-bold text-gray-400 uppercase">/ 5.0</span>}
+          </div>
         </div>
       ))}
     </div>

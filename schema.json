@@ -64,6 +64,22 @@
     "last_name",
     "age",
     "experience",
-    "full_name"
-  ]
-}
+      "full_name"
+    ],
+    "posts": [
+      "id",
+      "user_id",
+      "content",
+      "tag",
+      "created_at",
+      "updated_at"
+    ],
+    "replies": [
+      "id",
+      "post_id",
+      "user_id",
+      "content",
+      "created_at",
+      "updated_at"
+    ]
+  }

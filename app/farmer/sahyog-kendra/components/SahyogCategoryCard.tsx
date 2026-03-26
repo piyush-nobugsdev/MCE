@@ -1,6 +1,9 @@
-import { LucideIcon } from 'lucide-react'
+'use client'
 
-interface SahyogCategoryCardProps {
+import { LucideIcon } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+
+interface Props {
   id: string
   title: string
   description: string
@@ -8,26 +11,23 @@ interface SahyogCategoryCardProps {
   onClick: () => void
 }
 
-export function SahyogCategoryCard({ id, title, description, icon: Icon, onClick }: SahyogCategoryCardProps) {
-  const getIconColor = (cid: string) => {
-    switch (cid) {
-      case 'natural-disaster': return 'text-blue-600'
-      case 'crop-disease': return 'text-green-600'
-      case 'market-loss': return 'text-orange-600'
-      default: return 'text-purple-600'
-    }
-  }
-
+export function SahyogCategoryCard({ title, description, icon: Icon, onClick }: Props) {
   return (
-    <button
+    <Card 
+      className="group cursor-pointer rounded-[2rem] border border-gray-100/50 shadow-sm hover:border-green-200/50 hover:shadow-2xl hover:shadow-green-100/30 transition-all duration-500 overflow-hidden bg-white/80 backdrop-blur-sm"
       onClick={onClick}
-      className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100/50 text-left hover:scale-[1.02] hover:shadow-2xl hover:shadow-green-50 transition-all group"
     >
-      <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 transition-colors">
-        <Icon className={`w-8 h-8 ${getIconColor(id)} group-hover:text-white transition-colors`} />
-      </div>
-      <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-2 leading-none">{title}</h3>
-      <p className="text-sm font-bold text-gray-600 leading-relaxed max-w-[200px]">{description}</p>
-    </button>
+      <CardContent className="p-8">
+        <div className="flex items-start gap-5">
+          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center group-hover:bg-green-600 group-hover:text-white transition-all duration-500 shadow-inner">
+            <Icon className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
+          </div>
+          <div className="flex-1 space-y-2 pt-1">
+            <h3 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.2em] group-hover:text-green-600 transition-colors">{title}</h3>
+            <p className="text-[10px] text-gray-400 font-bold leading-relaxed uppercase tracking-widest opacity-70">{description}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }

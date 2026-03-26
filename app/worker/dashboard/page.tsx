@@ -11,6 +11,8 @@ import { Worker, Job, WorkerApplicationDetails } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { getWorkerApplications } from '@/app/actions/applications'
 import { rateUser } from '@/app/actions/ratings'
+import { getJobs } from '@/app/actions/jobs'
+import { findWorkerByUserId } from '@/lib/api/worker'
 import { toast } from 'sonner'
 
 export default function WorkerDashboard() {
@@ -42,22 +44,14 @@ export default function WorkerDashboard() {
         return
       }
 
-      const { data: workerData } = await supabase
-        .from('workers')
-        .select('*')
-        .eq('user_id', user.id)
-        .single()
+      const workerData = await findWorkerByUserId(user.id)
 
       if (workerData) {
         setWorker(workerData)
         
-        // Fetch open jobs
-        const { data: jobsData } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('status', 'open')
-          .order('created_at', { ascending: false })
-        if (jobsData) setJobs(jobsData)
+        // Fetch open jobs using server action
+        const jobsResult = await getJobs({ status: 'open' })
+        if (jobsResult.jobs) setJobs(jobsResult.jobs)
 
         // Fetch applications
         const appsResult = await getWorkerApplications()
@@ -92,11 +86,11 @@ export default function WorkerDashboard() {
     }
   }
 
-  if (loading) return <div className="p-10 text-center text-gray-400 font-bold">Loading...</div>
+  if (loading) return <div className="p-10 text-center text-gray-400 font-bold">{t('loading_profile')}</div>
   
   if (!worker) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <p className="text-red-500 font-bold">Profile not found. Please log in again.</p>
+      <p className="text-red-500 font-bold">{t('profile_not_found')}</p>
     </div>
   )
 
@@ -107,9 +101,9 @@ export default function WorkerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Hello, <span className="text-blue-600">{worker.first_name}!</span>
+            {t('hello')}, <span className="text-blue-600">{worker.first_name}!</span>
           </h1>
-          <p className="text-lg text-gray-500 mt-1 font-medium italic">Find the best farm jobs near you</p>
+          <p className="text-lg text-gray-500 mt-1 font-medium italic">{t('find_best_jobs')}</p>
         </div>
 
         {/* Stats Section - Simple & Clear */}
@@ -169,8 +163,8 @@ export default function WorkerDashboard() {
         {applications.length > 0 && (
           <div className="space-y-6 mb-16">
             <div className="flex items-center justify-between px-2">
-               <h2 className="text-2xl font-bold text-gray-900">Your Applications</h2>
-               <Link href="/worker/applications" className="text-sm font-bold text-blue-600 hover:underline">See All</Link>
+               <h2 className="text-2xl font-bold text-gray-900">{t('your_applications')}</h2>
+               <Link href="/worker/applications" className="text-sm font-bold text-blue-600 hover:underline">{t('see_all')}</Link>
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -184,7 +178,7 @@ export default function WorkerDashboard() {
                         app.status === 'accepted' ? 'bg-green-50 text-green-700' :
                         'bg-red-50 text-red-700'
                       }`}>
-                        {app.job_status === 'completed' && app.status === 'accepted' ? 'Job Completed' : app.status}
+                        {app.job_status === 'completed' && app.status === 'accepted' ? t('job_completed') : app.status}
                       </span>
                       {app.status === 'accepted' ? (
                         <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">
@@ -198,7 +192,7 @@ export default function WorkerDashboard() {
                   </div>
                   <div className="flex items-center justify-between md:justify-end gap-10">
                     <div className="text-right">
-                      <p className="text-xs font-bold text-gray-400 mb-0.5">Pay Rate</p>
+                      <p className="text-xs font-bold text-gray-400 mb-0.5">{t('pay_rate')}</p>
                       <p className="text-lg font-bold text-green-600 flex items-center gap-1">
                         <IndianRupee className="w-4 h-4" /> {app.job_wage}
                       </p>
@@ -224,12 +218,12 @@ export default function WorkerDashboard() {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-2">
              <h2 className="text-2xl font-bold text-gray-900">{t('available_work')}</h2>
-             <Link href="/worker/jobs" className="text-sm font-bold text-blue-600 hover:underline">See All</Link>
-          </div>
+             <Link href="/worker/jobs" className="text-sm font-bold text-blue-600 hover:underline">{t('see_all')}</Link>
+            </div>
 
           {jobs.length === 0 ? (
             <div className="bg-white p-12 rounded-3xl border border-gray-100 text-center">
-               <p className="text-gray-300 font-bold">Searching for new jobs...</p>
+               <p className="text-gray-300 font-bold">{t('searching_jobs')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
@@ -238,14 +232,14 @@ export default function WorkerDashboard() {
                   <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-blue-200 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">Available</span>
+                        <span className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700">{t('available')}</span>
                         <span className="text-xs font-bold text-gray-400">📍 {typeof job.location === 'string' ? job.location : job.location?.name}</span>
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">{job.title}</h3>
                     </div>
                     <div className="flex items-center justify-between md:justify-end gap-10">
                       <div className="text-right">
-                        <p className="text-xs font-bold text-gray-400 mb-0.5">Daily Pay</p>
+                        <p className="text-xs font-bold text-gray-400 mb-0.5">{t('daily_pay')}</p>
                         <p className="text-lg font-bold text-green-600 flex items-center gap-1">
                           <IndianRupee className="w-4 h-4" /> {job.wage_amount}
                         </p>
@@ -267,7 +261,7 @@ export default function WorkerDashboard() {
             <CardContent className="p-8">
               <div className="space-y-6">
                 <div className="text-center">
-                  <h3 className="text-2xl font-bold text-gray-900">Rate Farmer</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">{t('rate_farmer')}</h3>
                   <p className="text-gray-500 mt-2">Farmer Code: <span className="font-bold text-green-600">{ratingModal.farmerCode}</span></p>
                 </div>
 
@@ -289,13 +283,13 @@ export default function WorkerDashboard() {
 
                 {/* Feedback */}
                 <div className="space-y-3">
-                  <p className="text-sm font-bold text-gray-700">Feedback</p>
+                  <p className="text-sm font-bold text-gray-700">{t('feedback_label')}</p>
                   <select
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                     className="w-full p-3 border border-gray-200 rounded-xl"
                   >
-                    <option value="">Select feedback...</option>
+                    <option value="">{t('select_feedback')}</option>
                     <option value="Good pay">Good pay</option>
                     <option value="Fair treatment">Fair treatment</option>
                     <option value="Clear instructions">Clear instructions</option>
@@ -312,14 +306,14 @@ export default function WorkerDashboard() {
                     className="flex-1"
                     disabled={ratingLoading}
                   >
-                    Cancel
+                    {t('cancel')}
                   </Button>
                   <Button
                     onClick={handleRateFarmer}
                     className="flex-1 bg-yellow-600 hover:bg-yellow-700"
                     disabled={ratingLoading}
                   >
-                    {ratingLoading ? "Rating..." : "Submit Rating"}
+                    {ratingLoading ? t('rating_in_progress') : t('submit_rating')}
                   </Button>
                 </div>
               </div>
