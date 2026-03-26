@@ -25,15 +25,23 @@ export function WeatherWidget({ lat, lng }: WeatherWidgetProps) {
   useEffect(() => {
     async function fetchWeather() {
       try {
-        await new Promise(resolve => setTimeout(resolve, 1500)) 
+        // REAL-TIME API (Replace with your actual weather API)
+        const response = await fetch(`https://api.weatherapi.com/v1/forecast.json?key=YOUR_API_KEY&q=${lat},${lng}&days=4`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch weather');
+        }
+        const data = await response.json();
 
-        const mockData: WeatherData[] = [
-          { temp: 36, condition: 'Sunny', rainProb: 10, windSpeed: 12, date: 'Today' },
-          { temp: 32, condition: 'Partial Rain', rainProb: 75, windSpeed: 18, date: 'Tomorrow' },
-          { temp: 29, condition: 'Heavy Rain', rainProb: 90, windSpeed: 25, date: 'Sat, 28 Mar' },
-          { temp: 31, condition: 'Clear Sky', rainProb: 5, windSpeed: 10, date: 'Sun, 29 Mar' }
-        ]
-        setForecast(mockData)
+        // Map the API response to the WeatherData interface
+        const formattedData: WeatherData[] = data.forecast.forecastday.map((day: any, index: number) => ({
+          temp: day.day.avgtemp_c,
+          condition: day.day.condition.text,
+          rainProb: day.day.daily_chance_of_rain,
+          windSpeed: day.day.maxwind_kph,
+          date: index === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short' }),
+        }));
+
+        setForecast(formattedData);
       } catch (err) {
         setError('Could not load weather data')
       } finally {
