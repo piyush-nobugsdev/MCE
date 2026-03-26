@@ -10,6 +10,7 @@ import { Plus, Briefcase, Users, Star, IndianRupee, ChevronRight, MapPin } from 
 import { Farmer, Job } from '@/lib/types'
 import { useLanguage } from '@/lib/i18n/context'
 import { getReceivedReviews, getRatingSummary } from '@/app/actions/ratings'
+import { VoiceJobButton } from '@/components/VoiceJobButton'
 
 export default function FarmerDashboard() {
   const { t } = useLanguage()
@@ -77,7 +78,7 @@ export default function FarmerDashboard() {
       <main className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900 leading-tight">
-            Welcome back, <span className="text-green-600">{farmer.first_name || farmer.full_name}!</span>
+            Welcome back, <span className="text-green-600">{farmer.first_name}!</span>
           </h1>
           <p className="text-lg text-gray-500 mt-1 font-medium italic">Manage your farm and help workers find jobs</p>
         </div>
@@ -118,7 +119,7 @@ export default function FarmerDashboard() {
         </div>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Link href="/farmer/jobs/new">
             <Button className="w-full h-24 bg-green-600 hover:bg-green-700 rounded-3xl shadow-lg shadow-green-100 text-white flex items-center justify-between px-8">
               <div className="flex items-center gap-4">
@@ -142,6 +143,10 @@ export default function FarmerDashboard() {
               <ChevronRight className="w-6 h-6 opacity-10 text-gray-900" />
             </Button>
           </Link>
+        </div>
+
+        <div className="mb-16">
+           <VoiceJobButton />
         </div>
 
         {/* Recent Reviews - NEW! */}
