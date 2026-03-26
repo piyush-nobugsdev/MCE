@@ -9,7 +9,13 @@ type LanguageContextType = {
   t: (key: keyof typeof translations['en']) => string
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+const defaultContext: LanguageContextType = {
+  language: 'en',
+  setLanguage: () => {},
+  t: (key) => translations['en'][key] || (key as string)
+}
+
+const LanguageContext = createContext<LanguageContextType>(defaultContext)
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en')
@@ -27,6 +33,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
     localStorage.setItem('app_language', lang)
+    document.cookie = `app_language=${lang}; path=/; max-age=31536000; SameSite=Lax`
   }
 
   const t = (key: keyof typeof translations['en']): string => {
@@ -44,8 +51,5 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
 export function useLanguage() {
   const context = useContext(LanguageContext)
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider')
-  }
   return context
 }

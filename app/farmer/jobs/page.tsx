@@ -1,46 +1,36 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FarmerNavbar } from '../components/navbar'
 import Link from 'next/link'
 import { Plus, Briefcase, MapPin, IndianRupee, Users, Clock, ChevronRight } from 'lucide-react'
-import { Job } from '@/lib/types'
-import { useLanguage } from '@/lib/i18n/context'
+import { getTranslations } from '@/lib/i18n/server'
+import { redirect } from 'next/navigation'
 
-export default function FarmerJobsPage() {
-  const { t } = useLanguage()
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
+export default async function FarmerJobsPage() {
+  const { t } = await getTranslations()
+  const supabase = await createClient()
+  
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    redirect('/auth/role-selection')
+  }
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+  const { data: farmer } = await supabase
+    .from('farmers')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
 
-      const { data: farmer } = await supabase
-        .from('farmers')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
-
-      if (farmer) {
-        const { data } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('farmer_id', farmer.id)
-          .order('created_at', { ascending: false })
-        if (data) setJobs(data)
-      }
-      setLoading(false)
-    }
-    fetchJobs()
-  }, [])
-
-  if (loading) return <div className="flex items-center justify-center min-h-screen font-bold text-gray-400">Loading your jobs...</div>
+  let jobs: any[] = []
+  if (farmer) {
+    const { data } = await supabase
+      .from('jobs')
+      .select('*')
+      .eq('farmer_id', farmer.id)
+      .order('created_at', { ascending: false })
+    if (data) jobs = data
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans pb-20">
@@ -133,7 +123,7 @@ export default function FarmerJobsPage() {
 
                     {/* Actions */}
                     <div className="pt-4 lg:pt-0 border-t lg:border-t-0 lg:border-l border-gray-50 lg:pl-10">
-                       <Link href={`/farmer/jobs/${job.id}`} className="w-full">
+                       <Link href={`/farmer/jobs/${job.id}`} className="w-full" prefetch={true}>
                          <Button className="w-full h-16 px-10 bg-black hover:bg-gray-900 text-white rounded-2xl text-lg font-bold flex items-center justify-center gap-3">
                            Manage <ChevronRight className="w-5 h-5" />
                          </Button>

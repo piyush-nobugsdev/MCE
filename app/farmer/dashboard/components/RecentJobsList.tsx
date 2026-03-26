@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { MapPin, IndianRupee, ChevronRight } from 'lucide-react'
 import { Job } from '@/lib/types'

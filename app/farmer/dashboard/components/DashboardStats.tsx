@@ -1,3 +1,5 @@
+'use client'
+
 import { Briefcase, Users, Star } from 'lucide-react'
 import { useLanguage } from '@/lib/i18n/context'
 
