@@ -30,3 +30,13 @@ export async function findFarmerByUserId(userId: string): Promise<Farmer | null>
       .single()
     return data
 }
+
+export async function getFarmerFarms(farmerId: string) {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('farms')
+    .select('*')
+    .eq('farmer_id', farmerId)
+    .order('created_at', { ascending: false })
+  return data || []
+}

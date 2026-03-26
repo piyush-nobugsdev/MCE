@@ -15,17 +15,21 @@ export async function POST(request: Request) {
     }
 
     const prompt = `
-Extract structured job data from the following input.
+Extract structured job data from the following input for a farm labor marketplace.
 
 Return ONLY valid JSON.
 
 Fields:
-- title
-- description
-- budget (number only, do not include symbols)
-- location (name of the place)
-- category (main skill needed, e.g., Harvesting, Weeding)
-- requirements (list of skills or items)
+- title: Short catchy job title
+- description: Detailed description
+- wage_amount: Daily wage per person (number only, no symbols)
+- workers_needed: Number of workers required (number only)
+- start_date: Expected job start date (YYYY-MM-DD or relative like "tomorrow", "Monday")
+- number_of_days: Duration of work in days (number only, default 1)
+- farm_name: Name of the farm if mentioned
+- location: General location or village
+- category: Main skill (Harvesting, Weeding, Pesticide, etc.)
+- requirements: List of skills or items needed
 
 Input:
 """
@@ -33,10 +37,13 @@ ${text}
 """
 
 Rules:
-- Infer missing values if possible
-- Keep output clean JSON
-- Do not include explanation
-- Budget should be a number (daily wage)
+- Infer missing values if possible.
+- Budget/Wage must be a number.
+- Workers needed must be a number.
+- For date: if "tomorrow", calculate based on ${new Date().toLocaleDateString()}.
+- If no farm name mentioned, leave field empty.
+- Keep output clean JSON.
+- Do not include explanation.
 `;
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {

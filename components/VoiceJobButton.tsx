@@ -11,9 +11,10 @@ import { Card, CardContent } from '@/components/ui/card'
 interface VoiceJobButtonProps {
   onExtracted?: (data: any) => void
   label?: string
+  farms?: any[]
 }
 
-export function VoiceJobButton({ onExtracted, label }: VoiceJobButtonProps) {
+export function VoiceJobButton({ onExtracted, label, farms = [] }: VoiceJobButtonProps) {
   const router = useRouter()
   const [isCapturing, setIsCapturing] = useState(false)
   const [isExtracting, setIsExtracting] = useState(false)
@@ -70,12 +71,27 @@ export function VoiceJobButton({ onExtracted, label }: VoiceJobButtonProps) {
       if (data.error) {
         toast.error(data.error)
       } else {
+        // MATCH FARM: If user named a farm, find it. Otherwise pick the first one.
+        let selectedFarmId = farms[0]?.id || ''
+        if (data.farm_name) {
+           const matchedFarm = farms.find(f => 
+             f.name.toLowerCase().includes(data.farm_name.toLowerCase()) ||
+             data.farm_name.toLowerCase().includes(f.name.toLowerCase())
+           )
+           if (matchedFarm) selectedFarmId = matchedFarm.id
+        }
+
+        const prefill = {
+          ...data,
+          farm_id: selectedFarmId
+        }
+
         if (onExtracted) {
-          onExtracted(data)
+          onExtracted(prefill)
           toast.success('Successfully updated fields with voice input!')
         } else {
           // Successful extraction! Store in session storage and redirect
-          sessionStorage.setItem('prefilledJob', JSON.stringify(data))
+          sessionStorage.setItem('prefilledJob', JSON.stringify(prefill))
           toast.success('Successfully extracted details! Redirecting...')
           router.push('/farmer/jobs/new')
         }
@@ -171,8 +187,8 @@ export function VoiceJobButton({ onExtracted, label }: VoiceJobButtonProps) {
               <div className="space-y-4">
                 <h3 className="text-2xl font-black text-gray-900 leading-tight">"Describe your requirements"</h3>
                 <div className="min-h-[160px] p-8 bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-100 flex items-center justify-center overflow-y-auto max-h-[300px]">
-                    <p className="text-lg font-medium text-gray-400 leading-relaxed italic">
-                        {fullTranscript || transcript || "Speak now... for example: 'I need 5 workers for rice harvesting in Village X starting Monday, daily wage 500'"}
+                  <p className="text-lg font-medium text-blue-600 leading-relaxed italic pr-4">
+                        {(fullTranscript + ' ' + (transcript || '')).trim() || "Speak now... for example: 'I need 5 workers for rice harvesting in Village X starting Monday, daily wage 500'"}
                     </p>
                 </div>
               </div>

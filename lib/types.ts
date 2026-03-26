@@ -74,10 +74,8 @@ export interface Job {
   title: string;
   category: string;
   description: string | null;
-  date_range: {
-    start_date: string;
-    end_date: string;
-  } | null;
+  start_date: string;
+  duration_days: number;
   start_time: string | null;
   end_time: string | null;
   workers_needed: number;

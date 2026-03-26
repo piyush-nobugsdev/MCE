@@ -10,7 +10,7 @@ import { QuickActions } from './components/QuickActions'
 import { RecentJobsList } from './components/RecentJobsList'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { findFarmerByUserId, getFarmerJobs } from '@/lib/api/farmer'
+import { findFarmerByUserId, getFarmerJobs, getFarmerFarms } from '@/lib/api/farmer'
 import { getReceivedReviews, getRatingSummary } from '@/app/actions/ratings'
 import { Card, CardContent } from '@/components/ui/card'
 import { StatCardsSkeleton, JobsListSkeleton } from '@/components/skeletons'
@@ -34,14 +34,15 @@ async function FarmerDashboardContent() {
   }
 
   // Parallel data fetching
-  const [jobs, reviewsResult, summaryResult] = await Promise.all([
+  const [jobs, reviewsResult, summaryResult, farms] = await Promise.all([
     getFarmerJobs(farmerData.id),
     getReceivedReviews(user.id, 'worker_to_farmer'),
-    getRatingSummary(user.id, 'worker_to_farmer')
+    getRatingSummary(user.id, 'worker_to_farmer'),
+    getFarmerFarms(farmerData.id)
   ])
 
-  const activeJobsCount = jobs.filter((j) => j.status === 'open').length
-  const completedJobsCount = jobs.filter((j) => j.status === 'completed').length
+  const activeJobsCount = jobs.filter((j: any) => j.status === 'open').length
+  const completedJobsCount = jobs.filter((j: any) => j.status === 'completed').length
   const ratingSummary = {
      average: summaryResult.average || 0,
      count: summaryResult.count || 0
@@ -59,7 +60,7 @@ async function FarmerDashboardContent() {
         
         <div className="space-y-4">
            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-[0.3em] ml-1">Quick Post by Voice</h2>
-           <VoiceJobButton />
+           <VoiceJobButton farms={farms} />
         </div>
 
         <div className="space-y-4">

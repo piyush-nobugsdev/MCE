@@ -31,7 +31,7 @@ export default function NewJobPage() {
     wage_amount: '0',
     wage_type: 'daily',
     start_date: '',
-    end_date: '',
+    duration_days: '1',
   })
   
   const [farms, setFarms] = useState<any[]>([])
@@ -43,8 +43,14 @@ export default function NewJobPage() {
       ...prev,
       title: data.title || prev.title,
       description: data.description ? (prev.description + '\n' + data.description) : prev.description,
-      wage_amount: data.budget?.toString() || prev.wage_amount,
+      wage_amount: data.wage_amount?.toString() || prev.wage_amount,
+      workers_needed: data.workers_needed?.toString() || prev.workers_needed,
+      start_date: data.start_date || prev.start_date,
+      duration_days: data.number_of_days?.toString() || prev.duration_days,
     }))
+    if (data.farm_id) {
+       handleFarmSelect(data.farm_id)
+    }
   }
 
   useEffect(() => {
@@ -59,8 +65,15 @@ export default function NewJobPage() {
           ...prev,
           title: data.title || prev.title,
           description: (data.description || '') + (data.requirements ? '\n\nRequirements: ' + data.requirements : ''),
-          wage_amount: data.budget?.toString() || prev.wage_amount,
+          wage_amount: data.wage_amount?.toString() || prev.wage_amount,
+          workers_needed: data.workers_needed?.toString() || prev.workers_needed,
+          start_date: data.start_date || prev.start_date,
+          duration_days: data.number_of_days?.toString() || prev.duration_days,
         }))
+        if (data.farm_id) {
+           setSelectedFarm(data.farm_id)
+           // We'll trust that fetchFarms will soon populate the list and selectedFarm will reflect
+        }
         sessionStorage.removeItem('prefilledJob')
         toast.success('AI extracted some job details for you!')
       } catch (e) {
@@ -90,17 +103,22 @@ export default function NewJobPage() {
     fetchFarms()
   }, [])
 
+  useEffect(() => {
+    if (farms.length > 0 && selectedFarm) {
+       const farm = farms.find(f => f.id === selectedFarm)
+       if (farm) {
+          setFormData(prev => ({
+            ...prev,
+            location_name: farm.nickname + ' (' + (farm.area_name || '') + ')',
+            latitude: farm.location.lat.toString(),
+            longitude: farm.location.lng.toString(),
+          }))
+       }
+    }
+  }, [farms, selectedFarm])
+
   const handleFarmSelect = (farmId: string) => {
     setSelectedFarm(farmId)
-    const farm = farms.find(f => f.id === farmId)
-    if (farm) {
-      setFormData(prev => ({
-        ...prev,
-        location_name: farm.nickname + ' (' + (farm.area_name || '') + ')',
-        latitude: farm.location.lat.toString(),
-        longitude: farm.location.lng.toString(),
-      }))
-    }
   }
 
   const handleFarmCreated = (farm: any) => {
@@ -364,15 +382,17 @@ export default function NewJobPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-300 uppercase tracking-widest pl-1">End Date (optional)</label>
+                    <label className="text-xs font-black text-gray-300 uppercase tracking-widest pl-1">Work Duration (Days)</label>
                     <div className="relative">
-                      <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-200" />
+                      <History className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-200" />
                       <input
-                        type="date"
-                        name="end_date"
-                        value={formData.end_date}
+                        type="number"
+                        name="duration_days"
+                        min="1"
+                        value={formData.duration_days}
                         onChange={handleChange}
-                        className="w-full pl-16 pr-6 h-20 border-2 border-gray-50 rounded-[28px] text-xl font-bold focus:outline-none focus:border-green-400 focus:bg-white bg-gray-50/50 transition-all font-sans"
+                        className="w-full pl-16 pr-6 h-20 border-2 border-gray-50 rounded-[28px] text-xl font-bold focus:outline-none focus:border-green-400 focus:bg-white bg-gray-50/50 transition-all"
+                        required
                       />
                     </div>
                   </div>

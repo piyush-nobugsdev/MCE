@@ -15,7 +15,7 @@ export async function createJob(data: {
   wage_amount: string | number
   wage_type: string
   start_date: string
-  end_date: string
+  duration_days: string | number
   start_time?: string
   end_time?: string
   is_negotiable?: boolean
@@ -58,10 +58,8 @@ const { data: job, error } = await supabase
       lng: Number(data.longitude),
       name: data.location_name,
     },
-    date_range: {
-      start_date: data.start_date,
-      end_date: data.end_date,
-    },
+    start_date: data.start_date,
+    duration_days: Number(data.duration_days),
     farmer_code,
     status: 'open',
   })

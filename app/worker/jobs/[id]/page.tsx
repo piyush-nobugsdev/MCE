@@ -394,9 +394,7 @@ export default function JobDetailPage() {
               <div className="space-y-2">
                 <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em]">Duration</p>
                 <p className="text-3xl font-black text-gray-900 uppercase">
-                  {job.date_range
-                    ? Math.ceil((new Date(job.date_range.end_date).getTime() - new Date(job.date_range.start_date).getTime()) / (1000 * 3600 * 24))
-                    : 0} Days
+                  {job.duration_days || 1} Days
                 </p>
               </div>
               <div className="space-y-2 hidden md:block">

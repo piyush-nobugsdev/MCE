@@ -53,14 +53,14 @@ export function useSpeechRecognition(onResult: (text: string) => void) {
   }, [onResult])
 
   const startListening = useCallback(() => {
-    if (recognitionRef.current) {
+    if (recognitionRef.current && !isListening) {
         try {
             recognitionRef.current.start()
         } catch (e) {
             console.error('Speech recognition error on start:', e)
         }
     }
-  }, [])
+  }, [isListening])
 
   const stopListening = useCallback(() => {
     if (recognitionRef.current) {
